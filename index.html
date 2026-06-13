@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Você — Algo Especial</title>
+
+<style>
+/* =============================================
+   VARIÁVEIS E RESET GLOBAL
+   ============================================= */
+:root {
+  --nome: "Kakau"; /* ← EDITE AQUI O NOME */
+
+  --c-creme:    #FAF7F2;
+  --c-bege:     #EDE6D8;
+  --c-forest:   #2D4A35;
+  --c-moss:     #4A6B52;
+  --c-sage:     #7A9B82;
+  --c-muted:    #6B8570;
+  --c-deep:     #1E3326;
+  --c-gold:     #C4A35A;
+  --c-gold-lt:  #E8D5A3;
+  --c-bg:       #F2EDE4;
+  --c-bg2:      #E4EBDC;
+  --c-text:     #2A3328;
+  --c-muted-t:  rgba(42,51,40,0.62);
+
+  --f-hand:    'Caveat', 'Segoe Script', cursive;
+  --f-display: 'Lora', 'Georgia', serif;
+  --f-body:    'Lora', 'Georgia', serif;
+
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--f-body);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* Importar fontes via @import dentro do CSS */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap');
+
+/* =============================================
+   PARTÍCULAS DE FUNDO (canvas global)
+   ============================================= */
+#canvas-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+#light-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.7;
+}
+
+/* =============================================
+   SEÇÃO 1 — TELA INICIAL
+   ============================================= */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 18%, rgba(232,213,163,0.45) 0%, transparent 62%),
+    radial-gradient(ellipse 55% 45% at 78% 55%, rgba(122,155,130,0.22) 0%, transparent 58%),
+    radial-gradient(ellipse 50% 40% at 22% 62%, rgba(74,107,82,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 50% 85%, rgba(196,163,90,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-ornament {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--c-gold), transparent);
+  margin: 0 auto 2rem;
+  opacity: 0;
+  animation: fadeIn 1.2s 0.5s var(--ease-smooth) forwards;
+}
+
+.hero-eyebrow {
+  font-family: var(--f-hand);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--c-moss);
+  opacity: 0;
+  animation: fadeUp 1s 0.8s var(--ease-smooth) forwards;
+}
+
+/* ← NOME DA GAROTA — edite a variável --nome no :root acima */
+.hero-name {
+  font-family: var(--f-hand);
+  font-size: clamp(3.5rem, 13vw, 7.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--c-forest);
+  margin: 0.5rem 0 1rem;
+  opacity: 0;
+  animation: fadeUp 1.2s 1s var(--ease-smooth) forwards;
+}
+
+.hero-name span {
+  background: linear-gradient(135deg, #2D4A35 0%, #4A6B52 40%, #C4A35A 75%, #7A9B82 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-tagline {
+  font-family: var(--f-display);
+  font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-muted-t);
+  max-width: 520px;
+  margin: 0 auto 0.75rem;
+  opacity: 0;
+  animation: fadeUp 1s 1.3s var(--ease-smooth) forwards;
+}
+
+.hero-typed {
+  font-family: var(--f-hand);
+  font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+  font-weight: 500;
+  color: var(--c-forest);
+  letter-spacing: 0.01em;
+  min-height: 1.5em;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 1s 1.6s var(--ease-smooth) forwards;
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--c-gold);
+  vertical-align: middle;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+}
+
+.btn-continuar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 2.2rem;
+  border: 1px solid rgba(74,107,82,0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--c-forest);
+  font-family: var(--f-hand);
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.35s, border-color 0.35s, color 0.35s, transform 0.2s;
+  opacity: 0;
+  animation: fadeUp 1s 2s var(--ease-smooth) forwards;
+  text-decoration: none;
+}
+.btn-continuar:hover {
+  background: rgba(74,107,82,0.08);
+  border-color: var(--c-moss);
+  color: var(--c-deep);
+  transform: translateY(-2px);
+}
+.btn-continuar svg { width: 16px; height: 16px; stroke: currentColor; fill: none; transition: transform 0.3s; }
+.btn-continuar:hover svg { transform: translateX(4px); }
+
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0;
+  animation: fadeIn 1s 3s var(--ease-smooth) forwards;
+  color: var(--c-muted-t);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--c-gold), transparent);
+  animation: scrollPulse 2s infinite;
+}
+
+/* =============================================
+   SEÇÕES GERAIS
+   ============================================= */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 6rem 2rem;
+}
+
+.section-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-eyebrow {
+  font-family: var(--f-hand);
+  font-size: 1.2rem;
+  letter-spacing: 0.03em;
+  color: var(--c-moss);
+  margin-bottom: 0.75rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth);
+}
+
+.section-title {
+  font-family: var(--f-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.25;
+  color: var(--c-deep);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.9s 0.1s var(--ease-smooth), transform 0.9s 0.1s var(--ease-smooth);
+}
+
+.divider {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(to right, var(--c-gold), transparent);
+  margin-bottom: 2rem;
+  opacity: 0;
+  transition: opacity 1s 0.2s;
+}
+
+.is-visible .section-eyebrow,
+.is-visible .section-title,
+.is-visible .divider {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =============================================
+   SEÇÃO 2 — MOTIVOS
+   ============================================= */
+#razoes { background: var(--c-bg2); }
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.card-razao {
+  position: relative;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(74,107,82,0.18);
+  border-radius: 4px;
+  padding: 2rem 1.75rem;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth),
+              border-color 0.35s, background 0.35s;
+}
+.card-razao.is-visible { opacity: 1; transform: translateY(0); }
+.card-razao:hover {
+  background: rgba(255,255,255,0.75);
+  border-color: rgba(74,107,82,0.35);
+}
+.card-razao::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--c-gold), transparent);
+  transform: scaleX(0);
+  transition: transform 0.5s var(--ease-smooth);
+}
+.card-razao:hover::before { transform: scaleX(1); }
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--c-gold);
+  font-size: 1.5rem;
+}
+.card-icon svg { width: 28px; height: 28px; stroke: var(--c-gold); fill: none; stroke-width: 1.5; }
+
+.card-razao h3 {
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-deep);
+  margin-bottom: 0.6rem;
+}
+.card-razao p {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--c-muted-t);
+  line-height: 1.75;
+}
+.card-num {
+  position: absolute;
+  bottom: 1rem;
+  right: 1.25rem;
+  font-family: var(--f-display);
+  font-size: 3.5rem;
+  font-weight: 600;
+  color: rgba(74,107,82,0.08);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* =============================================
+   SEÇÃO 3 — LINHA DO TEMPO
+   ============================================= */
+#timeline { background: var(--c-bg); padding: 6rem 2rem 7rem; }
+
+.timeline-line {
+  position: relative;
+}
+.timeline-line::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.25), transparent);
+  transform: translateX(-50%);
+}
+
+.t-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth);
+}
+.t-item:nth-child(odd) { flex-direction: row; transform: translateX(-30px); }
+.t-item:nth-child(even) { flex-direction: row-reverse; transform: translateX(30px); }
+.t-item.is-visible { opacity: 1; transform: translateX(0); }
+
+.t-content {
+  flex: 1;
+  max-width: calc(50% - 2.5rem);
+}
+.t-item:nth-child(odd) .t-content { text-align: right; }
+.t-item:nth-child(even) .t-content { text-align: left; }
+
+.t-date {
+  font-family: var(--f-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  margin-bottom: 0.4rem;
+}
+.t-content h3 {
+  font-family: var(--f-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-deep);
+  margin-bottom: 0.5rem;
+}
+.t-content p {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--c-muted-t);
+  line-height: 1.75;
+}
+
+.t-dot {
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--c-gold);
+  background: var(--c-bg2);
+  margin-top: 0.35rem;
+  align-self: flex-start;
+}
+.t-dot::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.t-item.is-visible .t-dot::after { opacity: 1; }
+
+/* Mobile timeline */
+@media (max-width: 640px) {
+  .timeline-line::before { left: 14px; }
+  .t-item, .t-item:nth-child(even) { flex-direction: row; transform: translateX(-20px); }
+  .t-content, .t-item:nth-child(odd) .t-content { text-align: left; max-width: 100%; }
+  .t-dot { flex-shrink: 0; }
+}
+
+/* =============================================
+   SEÇÃO 4 — CARTA
+   ============================================= */
+#carta { background: var(--c-bg); overflow: hidden; }
+
+.carta-wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.carta-ornament-tl,
+.carta-ornament-br {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.carta-ornament-tl { top: -1rem; left: -1rem; border-top: 1px solid var(--c-gold); border-left: 1px solid var(--c-gold); }
+.carta-ornament-br { bottom: -1rem; right: -1rem; border-bottom: 1px solid var(--c-gold); border-right: 1px solid var(--c-gold); }
+
+.carta-inner {
+  padding: 3.5rem 3rem;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(74,107,82,0.16);
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s var(--ease-smooth), transform 1s var(--ease-smooth);
+}
+.carta-inner.is-visible { opacity: 1; transform: translateY(0); }
+
+.carta-saudacao {
+  font-family: var(--f-hand);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--c-moss);
+  margin-bottom: 2rem;
+}
+.carta-inner p {
+  font-size: 1.02rem;
+  font-weight: 400;
+  color: rgba(42,51,40,0.88);
+  line-height: 1.9;
+  margin-bottom: 1.4rem;
+}
+.carta-inner p em {
+  font-family: var(--f-hand);
+  font-style: normal;
+  font-size: 1.15em;
+  color: var(--c-forest);
+}
+.carta-assinatura {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(74,107,82,0.15);
+}
+.carta-assinatura p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--c-muted-t);
+}
+.carta-assinatura strong {
+  display: block;
+  font-family: var(--f-hand);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--c-gold-lt);
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 600px) {
+  .carta-inner { padding: 2.5rem 1.75rem; }
+}
+
+/* =============================================
+   SEÇÃO 6 — INTERATIVA
+   ============================================= */
+#interativa {
+  background: var(--c-bg2);
+  text-align: center;
+}
+
+.interativa-desc {
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--c-muted-t);
+  max-width: 420px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.8;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s 0.2s var(--ease-smooth), transform 0.8s 0.2s var(--ease-smooth);
+}
+.interativa-desc.is-visible { opacity: 1; transform: translateY(0); }
+
+.btn-especial {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 2.4rem;
+  background: transparent;
+  border: 1px solid rgba(74,107,82,0.35);
+  border-radius: 999px;
+  color: var(--c-forest);
+  font-family: var(--f-hand);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.4s, border-color 0.4s, transform 0.2s;
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  transition: opacity 0.8s 0.35s var(--ease-smooth),
+              transform 0.8s 0.35s var(--ease-smooth),
+              color 0.4s, border-color 0.4s;
+}
+.btn-especial.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+.btn-especial::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(201,169,110,0.0), rgba(201,169,110,0.15));
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.btn-especial:hover { border-color: var(--c-moss); color: var(--c-deep); }
+.btn-especial:hover::before { opacity: 1; }
+.btn-especial:active { transform: scale(0.98); }
+.btn-especial-icon { font-size: 1.1rem; transition: transform 0.35s var(--ease-spring); }
+.btn-especial:hover .btn-especial-icon { transform: rotate(15deg) scale(1.15); }
+
+/* =============================================
+   OVERLAY CINEMATOGRÁFICO
+   ============================================= */
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 1.2s var(--ease-smooth);
+  overflow: hidden;
+}
+#overlay.active {
+  background: rgba(0,0,0,0.65);
+  pointer-events: all;
+}
+
+#overlay-bg {
+  position: absolute;
+  inset: 0;
+  background: url('./overlay-campo.jpg') center center / cover no-repeat;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 1.4s var(--ease-smooth), transform 8s var(--ease-smooth);
+  filter: brightness(0.92) saturate(1.08);
+}
+#overlay.active #overlay-bg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#overlay-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(30,51,38,0.35) 0%, rgba(30,51,38,0.2) 50%, rgba(30,51,38,0.5) 100%);
+}
+
+#overlay-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 1.5s;
+}
+#overlay.active #overlay-canvas { opacity: 1; }
+
+.overlay-content {
+  position: relative;
+  z-index: 2;
+  padding: 1.5rem 2rem 2rem;
+  max-width: 960px;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  transition: opacity 0.8s, transform 0.8s var(--ease-smooth);
+}
+#overlay.active .overlay-content {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition-delay: 0.5s;
+}
+
+.poem-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.poem-header h2 {
+  font-family: var(--f-hand);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 600;
+  color: var(--c-creme);
+  text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+
+.poem-header p {
+  font-family: var(--f-display);
+  font-size: 0.85rem;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: rgba(240,232,224,0.65);
+  margin-top: 0.4rem;
+}
+
+.poem-body {
+  max-width: 520px;
+  margin: 0 auto;
+  max-height: min(62vh, 480px);
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,169,110,0.25) transparent;
+}
+
+.poem-stanza {
+  margin-bottom: 1.5rem;
+}
+
+.poem-line {
+  font-family: var(--f-hand);
+  font-size: clamp(1.25rem, 3.5vw, 1.65rem);
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgba(240,232,224,0.2);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth), color 0.6s;
+  margin-bottom: 0.2rem;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.5);
+}
+
+.poem-line.visible {
+  opacity: 1;
+  transform: translateY(0);
+  color: rgba(255,248,245,0.95);
+}
+
+.poem-line.highlight {
+  color: #FFF8E8;
+  font-size: clamp(1.35rem, 3.8vw, 1.8rem);
+  text-shadow: 0 2px 18px rgba(196,163,90,0.45);
+}
+
+.poem-line.gap { height: 0.6rem; }
+
+.poem-sign {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(201,169,110,0.15);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1s var(--ease-smooth), transform 1s var(--ease-smooth);
+}
+
+.poem-sign.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.poem-sign p {
+  font-size: 0.78rem;
+  color: var(--c-muted-t);
+  margin-bottom: 0.3rem;
+}
+
+.poem-sign strong {
+  font-family: var(--f-hand);
+  font-weight: 600;
+  font-size: 1.35rem;
+  color: var(--c-gold-lt);
+}
+
+.btn-fechar {
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.6rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 999px;
+  background: rgba(0,0,0,0.25);
+  color: rgba(240,232,224,0.75);
+  font-family: var(--f-hand);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  margin: 1.5rem auto 0;
+  display: flex;
+  width: fit-content;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.btn-fechar:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(0,0,0,0.4);
+}
+
+/* =============================================
+   FLORES DECORATIVAS
+   ============================================= */
+.flor-decor {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.32;
+  filter: drop-shadow(0 2px 8px rgba(74,107,82,0.15));
+  animation: florFloat 7s ease-in-out infinite;
+}
+.flor-decor img { width: 100%; height: auto; display: block; }
+
+.flor-hero-tr { top: 8%; right: 4%; width: clamp(55px, 11vw, 95px); animation-delay: 0s; }
+.flor-hero-bl { bottom: 12%; left: 3%; width: clamp(45px, 9vw, 75px); animation-delay: -2s; opacity: 0.2; transform: scaleX(-1); }
+.flor-razoes   { top: 2rem; left: -0.5rem; width: clamp(50px, 10vw, 85px); animation-delay: -1s; }
+.flor-carta-tr { top: -1.5rem; right: -0.5rem; width: clamp(60px, 12vw, 100px); opacity: 0.35; animation-delay: -3s; }
+.flor-carta-bl { bottom: -1rem; left: -1rem; width: clamp(50px, 10vw, 80px); transform: scaleX(-1); animation-delay: -4s; }
+.flor-inter    { top: 1rem; right: 5%; width: clamp(55px, 11vw, 90px); opacity: 0.32; animation-delay: -2.5s; }
+.flor-timeline { top: 1.5rem; right: 2%; width: clamp(50px, 10vw, 80px); opacity: 0.28; animation-delay: -1.5s; }
+.flor-footer   { bottom: 1.5rem; left: 50%; width: clamp(40px, 8vw, 65px); opacity: 0.22; animation: florFooter 0s; transform: translateX(-50%); }
+
+@keyframes florFooter { from, to { transform: translateX(-50%); } }
+
+@keyframes florFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-10px) rotate(3deg); }
+}
+.flor-hero-bl { animation-name: florFloatAlt; }
+.flor-carta-bl { animation-name: florFloatAlt; }
+@keyframes florFloatAlt {
+  0%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); }
+  50%      { transform: scaleX(-1) translateY(-8px) rotate(-2deg); }
+}
+
+/* =============================================
+   SEÇÃO MOMENTO — FOTO ESPECIAL
+   ============================================= */
+#momento {
+  background: var(--c-bg2);
+  padding: 5rem 1.25rem 6rem;
+  overflow: hidden;
+}
+
+.momento-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 1s var(--ease-smooth), transform 1s var(--ease-smooth);
+}
+.momento-wrap.is-visible { opacity: 1; transform: translateY(0); }
+
+.momento-frame {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(45,74,53,0.18), 0 0 0 1px rgba(74,107,82,0.15);
+}
+
+.momento-frame img {
+  width: 100%;
+  display: block;
+  filter: saturate(1.05) brightness(1.02);
+  transform: scale(1.02);
+  transition: transform 6s var(--ease-smooth);
+}
+.momento-wrap.is-visible .momento-frame img { transform: scale(1); }
+
+.momento-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 50%, rgba(30,51,38,0.25) 100%),
+    linear-gradient(to top, rgba(30,51,38,0.55) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.momento-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2.5rem 1.75rem 2rem;
+  text-align: center;
+}
+
+.momento-quote {
+  font-family: var(--f-hand);
+  font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(255,248,245,0.95);
+  text-shadow: 0 2px 16px rgba(0,0,0,0.8);
+  margin-bottom: 0.5rem;
+}
+
+.momento-sub {
+  font-family: var(--f-display);
+  font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+  font-style: italic;
+  color: rgba(240,232,224,0.7);
+}
+
+.momento-flor {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: clamp(45px, 10vw, 70px);
+  opacity: 0.45;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));
+  animation: florFloat 6s ease-in-out infinite;
+}
+
+@media (max-width: 640px) {
+  .overlay-content { padding: 1rem 1rem 1.5rem; }
+  .poem-body { max-height: 68vh; padding: 0.25rem 0.5rem; }
+  .flor-hero-tr, .flor-razoes, .flor-inter { opacity: 0.16; }
+  .momento-text { padding: 1.75rem 1.25rem 1.5rem; }
+}
+
+/* =============================================
+   RODAPÉ
+   ============================================= */
+footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 3rem 2rem;
+  border-top: 1px solid rgba(74,107,82,0.12);
+  background: var(--c-bg);
+}
+footer p {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--c-muted-t);
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+/* =============================================
+   SEÇÃO REFÚGIO — Se algum dia você precisar
+   ============================================= */
+#refugio {
+  background: linear-gradient(180deg, var(--c-bg2) 0%, rgba(228,235,220,0.95) 50%, var(--c-bg) 100%);
+  padding: 6rem 2rem 7rem;
+  overflow: hidden;
+}
+
+.refugio-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 45% at 30% 20%, rgba(232,213,163,0.2) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(122,155,130,0.15) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.flor-refugio-tr { top: 3%; right: 3%; width: clamp(50px, 10vw, 85px); opacity: 0.26; }
+.flor-refugio-bl { bottom: 5%; left: 2%; width: clamp(45px, 9vw, 75px); opacity: 0.22; transform: scaleX(-1); animation-name: florFloatAlt; }
+
+.refugio-intro {
+  max-width: 560px;
+  margin: 0 auto 3rem;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--c-muted-t);
+  line-height: 1.85;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth);
+}
+.is-visible.refugio-intro { opacity: 1; transform: translateY(0); }
+
+.refugio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.15rem;
+  margin-top: 1rem;
+}
+
+.refugio-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.35rem 1.25rem;
+  background: rgba(255,255,255,0.62);
+  border: 1px solid rgba(74,107,82,0.16);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth),
+              background 0.35s, border-color 0.35s, box-shadow 0.35s;
+}
+.refugio-card.is-visible { opacity: 1; transform: translateY(0); }
+.refugio-card:hover {
+  background: rgba(255,255,255,0.88);
+  border-color: rgba(74,107,82,0.32);
+  box-shadow: 0 8px 28px rgba(45,74,53,0.1);
+}
+.refugio-card:focus-visible {
+  outline: 2px solid var(--c-moss);
+  outline-offset: 2px;
+}
+
+.refugio-card-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+.refugio-card h3 {
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--c-deep);
+  line-height: 1.4;
+}
+
+.refugio-card p {
+  font-size: 0.78rem;
+  color: var(--c-muted-t);
+  margin-top: 0.35rem;
+  line-height: 1.5;
+}
+
+/* Overlay refúgio */
+#refugio-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s var(--ease-smooth), visibility 0.6s;
+}
+#refugio-overlay.active {
+  pointer-events: all;
+  opacity: 1;
+  visibility: visible;
+}
+
+.refugio-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(30,51,38,0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  transition: opacity 0.7s var(--ease-smooth);
+}
+#refugio-overlay.active .refugio-backdrop { opacity: 1; }
+
+.refugio-flor {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease-smooth), transform 1.4s var(--ease-smooth);
+}
+.refugio-flor img { width: 100%; height: auto; display: block; filter: drop-shadow(0 4px 12px rgba(74,107,82,0.12)); }
+.refugio-flor-1 { top: 8%; left: 6%; width: clamp(55px, 12vw, 95px); transform: translateY(12px); transition-delay: 0.3s; }
+.refugio-flor-2 { top: 12%; right: 8%; width: clamp(50px, 11vw, 85px); transform: translateY(12px); transition-delay: 0.55s; }
+.refugio-flor-3 { bottom: 10%; left: 10%; width: clamp(45px, 10vw, 75px); transform: scaleX(-1) translateY(12px); transition-delay: 0.75s; }
+.refugio-flor-4 { bottom: 14%; right: 6%; width: clamp(48px, 10vw, 80px); transform: translateY(12px); transition-delay: 0.95s; }
+#refugio-overlay.active .refugio-flor { opacity: 0.38; transform: translateY(0); }
+#refugio-overlay.active .refugio-flor-3 { transform: scaleX(-1) translateY(0); }
+
+.refugio-carta {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 620px;
+  max-height: min(82vh, 680px);
+  overflow-y: auto;
+  padding: 2.75rem 2.5rem 2.25rem;
+  background: rgba(250,247,242,0.97);
+  border: 1px solid rgba(74,107,82,0.18);
+  border-radius: 8px;
+  box-shadow: 0 24px 64px rgba(30,51,38,0.18), 0 0 0 1px rgba(255,255,255,0.5) inset;
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+  transition: opacity 0.8s 0.15s var(--ease-smooth), transform 0.8s 0.15s var(--ease-smooth);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74,107,82,0.2) transparent;
+}
+#refugio-overlay.active .refugio-carta {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.refugio-carta-tl,
+.refugio-carta-br {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  opacity: 0.25;
+  pointer-events: none;
+}
+.refugio-carta-tl { top: 0.75rem; left: 0.75rem; border-top: 1px solid var(--c-moss); border-left: 1px solid var(--c-moss); }
+.refugio-carta-br { bottom: 0.75rem; right: 0.75rem; border-bottom: 1px solid var(--c-moss); border-right: 1px solid var(--c-moss); }
+
+.refugio-fechar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(74,107,82,0.2);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+  color: var(--c-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+.refugio-fechar:hover {
+  background: rgba(255,255,255,0.95);
+  border-color: var(--c-moss);
+  color: var(--c-deep);
+}
+
+.refugio-carta h3 {
+  font-family: var(--f-hand);
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  font-weight: 600;
+  color: var(--c-forest);
+  margin-bottom: 0.5rem;
+  padding-right: 2rem;
+}
+
+.refugio-carta-saudacao {
+  font-family: var(--f-display);
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--c-muted);
+  margin-bottom: 1.75rem;
+}
+
+.refugio-carta-body p {
+  font-size: 1rem;
+  color: rgba(42,51,40,0.88);
+  line-height: 1.9;
+  margin-bottom: 1.25rem;
+}
+.refugio-carta-body p:last-child { margin-bottom: 0; }
+
+.refugio-assinatura {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(74,107,82,0.12);
+  font-family: var(--f-hand);
+  font-size: 1.15rem;
+  color: var(--c-moss);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  #refugio { padding: 5rem 1.25rem 6rem; }
+  .refugio-carta { padding: 2.25rem 1.5rem 2rem; }
+  .refugio-flor { opacity: 0 !important; }
+  #refugio-overlay.active .refugio-flor { opacity: 0.2 !important; }
+  .refugio-grid { grid-template-columns: 1fr; }
+}
+
+/* =============================================
+   ANIMAÇÕES KEYFRAMES
+   ============================================= */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes scrollPulse {
+  0%   { transform: scaleY(1); opacity: 0.6; }
+  50%  { transform: scaleY(1.3); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0.6; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* Smooth scroll reveal */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth); }
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+/* Acessibilidade: reduzir movimento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- =============================================
+     CANVAS FUNDO (partículas globais)
+     ============================================= -->
+<canvas id="canvas-bg"></canvas>
+<canvas id="light-canvas"></canvas>
+
+<!-- =============================================
+     SEÇÃO 1 — HERO
+     ============================================= -->
+<section id="hero" aria-label="Tela inicial">
+  <div class="hero-glow"></div>
+  <div class="flor-decor flor-hero-tr"><img src="./flor-decor.png" alt=""></div>
+  <div class="flor-decor flor-hero-bl"><img src="./flor-decor.png" alt=""></div>
+  <div class="hero-ornament"></div>
+
+  <p class="hero-eyebrow">Uma homenagem para</p>
+
+  <!-- ← EDITE O NOME ABAIXO -->
+  <h1 class="hero-name"><span id="hero-nome">Kakau</span></h1>
+
+  <p class="hero-tagline">Tem gente que entra num lugar e muda um pouco o ar. Você é assim — sem fazer esforço.</p>
+
+  <p class="hero-typed" id="typed-text"><span class="cursor-blink"></span></p>
+
+  <a href="#razoes" class="btn-continuar">
+    Continuar
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 12h14M12 5l7 7-7 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+
+  <div class="hero-scroll-hint">
+    <div class="scroll-line"></div>
+    <span>role</span>
+  </div>
+</section>
+
+<!-- =============================================
+     SEÇÃO 2 — MOTIVOS
+     ============================================= -->
+<section id="razoes" aria-label="Motivos pelos quais ela é especial">
+  <div class="flor-decor flor-razoes"><img src="./flor-decor.png" alt=""></div>
+  <div class="section-inner">
+    <p class="section-eyebrow">Coisas que noto em você</p>
+    <h2 class="section-title">Porque você<br>vale a pena</h2>
+    <div class="divider"></div>
+
+    <div class="cards-grid">
+
+      <!-- Card 1 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
+        </div>
+        <h3>A sua gentileza</h3>
+        <p>Você trata as pessoas com cuidado, mesmo nos dias ruins. Isso não passa despercebido — quem convive com você sente a diferença.</p>
+        <span class="card-num">01</span>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </div>
+        <h3>A sua luz</h3>
+        <p>Não é sobre chamar atenção. É que quando você aparece, o ambiente fica mais leve. As pessoas percebem, mesmo que você não veja.</p>
+        <span class="card-num">02</span>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-13v5l3 3"/></svg>
+        </div>
+        <h3>A sua força</h3>
+        <p>Você aguenta coisa que não fala. Segue em frente nos dias difíceis sem fazer drama. Isso é raro, e vale ser reconhecido.</p>
+        <span class="card-num">03</span>
+      </article>
+
+      <!-- Card 4 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <h3>Ser você mesma</h3>
+        <p>Você não tenta ser o que os outros esperam. Isso parece simples, mas quase ninguém consegue. E isso faz diferença.</p>
+        <span class="card-num">04</span>
+      </article>
+
+      <!-- Card 5 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3>A sua inteligência</h3>
+        <p>Você percebe coisas que passam batido. Conecta ideias de um jeito que surpreende. Conversar com você sempre rende mais do que a gente imagina.</p>
+        <span class="card-num">05</span>
+      </article>
+
+      <!-- Card 6 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <h3>O seu sorriso</h3>
+        <p>É uma daquelas coisas que a gente lembra sem querer. Não só porque é bonito — é porque parece de verdade. Parece você.</p>
+        <span class="card-num">06</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     SEÇÃO 3 — LINHA DO TEMPO
+     Edite os itens abaixo para personalizar
+     ============================================= -->
+<section id="timeline" aria-label="Momentos especiais">
+  <div class="flor-decor flor-timeline"><img src="./flor-decor.png" alt=""></div>
+  <div class="section-inner">
+    <p class="section-eyebrow">Memórias</p>
+    <h2 class="section-title">Momentos que<br>ficaram guardados</h2>
+    <div class="divider"></div>
+
+    <div class="timeline-line" style="margin-top: 3.5rem;">
+
+      <!-- ← EDITE CADA t-item ABAIXO -->
+
+      <div class="t-item">
+        <div class="t-content">
+          <p class="t-date">O começo</p>
+          <h3>Quando te conheci</h3>
+          <p>Lembro da primeira impressão. Não dava para ignorar. Tinha algo diferente na forma como você estava ali — calma, presente.</p>
+        </div>
+        <div class="t-dot"></div>
+        <div style="flex:1;max-width:calc(50% - 2.5rem)"></div>
+      </div>
+
+      <div class="t-item">
+        <div style="flex:1;max-width:calc(50% - 2.5rem)"></div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <p class="t-date">Uma conversa</p>
+          <h3>As palavras certas</h3>
+          <p>Teve um dia em que você disse algo simples, mas veio na hora certa. Ficou. Esse tipo de coisa a gente não esquece.</p>
+        </div>
+      </div>
+
+      <div class="t-item">
+        <div class="t-content">
+          <p class="t-date">Um dia qualquer</p>
+          <h3>Que virou especial</h3>
+          <p>Alguns dias parecem iguais a todos os outros. Aí você aparece, e ficam diferentes. Não pelo que aconteceu — pela sua presença.</p>
+        </div>
+        <div class="t-dot"></div>
+        <div style="flex:1;max-width:calc(50% - 2.5rem)"></div>
+      </div>
+
+      <div class="t-item">
+        <div style="flex:1;max-width:calc(50% - 2.5rem)"></div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <p class="t-date">Agora</p>
+          <h3>O que ficou</h3>
+          <p>Com o tempo, as memórias ficam mais suaves. Mas a certeza de que você é importante só cresce. Isso não muda.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     SEÇÃO 4 — CARTA
+     ============================================= -->
+<section id="carta" aria-label="Carta especial">
+  <div class="section-inner">
+    <p class="section-eyebrow">Palavras guardadas</p>
+    <h2 class="section-title">Uma carta</h2>
+    <div class="divider"></div>
+
+    <div class="carta-wrapper">
+      <div class="flor-decor flor-carta-tr"><img src="./flor-decor.png" alt=""></div>
+      <div class="flor-decor flor-carta-bl"><img src="./flor-decor.png" alt=""></div>
+      <div class="carta-ornament-tl"></div>
+      <div class="carta-ornament-br"></div>
+
+      <div class="carta-inner">
+        <!-- ← EDITE O NOME AQUI TAMBÉM -->
+        <p class="carta-saudacao">Querida Kakau,</p>
+
+        <p>Existem coisas que a gente sente e não sabe como dizer. Às vezes a gente fica quieto quando devia falar. Então deixa eu tentar.</p>
+
+        <p>Você muda o ambiente só de estar nele. Não de propósito — é só quem você é. Tem uma honestidade em você que não precisa se explicar.</p>
+
+        <p>O que mais me impressiona não é uma coisa só. É tudo junto: a inteligência com a gentileza, a força com a leveza. Pouca gente consegue isso.</p>
+
+        <p>Você faz diferença nas pessoas. Não de um jeito barulhento — do jeito quieto, que fica. Que muda como a gente vê as coisas.</p>
+
+        <p>Quis que você soubesse disso. Sem drama, sem expectativa. Só porque algumas coisas merecem ser ditas.</p>
+
+        <p><em>Obrigado por ser quem você é.</em></p>
+
+        <div class="carta-assinatura">
+          <p>Com carinho,</p>
+          <strong>Alguém que tem sorte de te conhecer</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =============================================
+     SEÇÃO 5 — MOMENTO ESPECIAL (FOTO)
+     ============================================= -->
+<section id="momento" aria-label="Um momento especial">
+  <div class="section-inner">
+    <p class="section-eyebrow">Uma foto</p>
+    <h2 class="section-title">Seu olhar</h2>
+    <div class="divider"></div>
+
+    <div class="momento-wrap">
+      <div class="momento-frame">
+        <img src="./seu-olhar.jpg" alt="Seu olhar">
+        <div class="momento-vignette"></div>
+        <img class="momento-flor" src="./flor-decor.png" alt="">
+        <div class="momento-text">
+          <p class="momento-quote">Tem gente que chama atenção<br>só de estar presente.</p>
+          <span class="momento-sub">Você faz isso sem perceber — seu olhar tem uma calma difícil de explicar.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     SEÇÃO REFÚGIO — Se algum dia você precisar
+     ============================================= -->
+<section id="refugio" aria-label="Se algum dia você precisar">
+  <div class="refugio-glow"></div>
+  <div class="flor-decor flor-refugio-tr"><img src="./flor-decor.png" alt=""></div>
+  <div class="flor-decor flor-refugio-bl"><img src="./flor-decor.png" alt=""></div>
+  <div class="section-inner">
+    <p class="section-eyebrow">Um lugar seguro</p>
+    <h2 class="section-title">Se algum dia<br>você precisar</h2>
+    <div class="divider"></div>
+
+    <p class="refugio-intro">
+      Kakau, nem todo dia é leve — e tudo bem. Esta parte existe para os dias difíceis.
+      Escolhe o que você está sentindo. Tem uma carta aqui, escrita pensando em você.
+    </p>
+
+    <div class="refugio-grid" id="refugio-grid" role="list"></div>
+  </div>
+</section>
+
+<!-- Overlay refúgio -->
+<div id="refugio-overlay" role="dialog" aria-modal="true" aria-labelledby="refugio-titulo" aria-hidden="true">
+  <div class="refugio-backdrop" id="refugio-backdrop"></div>
+  <div class="refugio-flor refugio-flor-1"><img src="./flor-decor.png" alt=""></div>
+  <div class="refugio-flor refugio-flor-2"><img src="./flor-decor.png" alt=""></div>
+  <div class="refugio-flor refugio-flor-3"><img src="./flor-decor.png" alt=""></div>
+  <div class="refugio-flor refugio-flor-4"><img src="./flor-decor.png" alt=""></div>
+  <div class="refugio-carta">
+    <div class="refugio-carta-tl"></div>
+    <div class="refugio-carta-br"></div>
+    <button class="refugio-fechar" id="refugio-fechar" aria-label="Fechar carta">✕</button>
+    <h3 id="refugio-titulo"></h3>
+    <p class="refugio-carta-saudacao">Para você, Kakau.</p>
+    <div class="refugio-carta-body" id="refugio-corpo"></div>
+    <p class="refugio-assinatura">Com carinho — sempre que precisar.</p>
+  </div>
+</div>
+
+<!-- =============================================
+     SEÇÃO 6 — INTERATIVA
+     ============================================= -->
+<section id="interativa" aria-label="Algo especial para você">
+  <div class="flor-decor flor-inter"><img src="./flor-decor.png" alt=""></div>
+  <div class="section-inner">
+    <p class="section-eyebrow">Só para você</p>
+    <h2 class="section-title reveal">Uma última coisa</h2>
+    <div class="divider reveal"></div>
+
+    <p class="interativa-desc">
+      Tem algo mais aqui embaixo. Clica quando quiser ver.
+    </p>
+
+    <button class="btn-especial" id="btn-especial" aria-label="Ver algo especial">
+      <span class="btn-especial-icon">✦</span>
+      Quero ver algo especial
+    </button>
+  </div>
+</section>
+
+<!-- =============================================
+     OVERLAY CINEMATOGRÁFICO
+     ============================================= -->
+<div id="overlay" role="dialog" aria-modal="true" aria-label="Poema especial">
+  <div id="overlay-bg" aria-hidden="true"></div>
+  <canvas id="overlay-canvas"></canvas>
+  <div class="overlay-content">
+    <div class="poem-header">
+      <h2>Para você</h2>
+      <p>palavras simples, de verdade</p>
+    </div>
+    <div class="poem-body" id="poem-body"></div>
+    <button class="btn-fechar" id="btn-fechar">✕ &nbsp; Fechar</button>
+  </div>
+</div>
+
+<!-- =============================================
+     RODAPÉ
+     ============================================= -->
+<footer>
+  <div class="flor-decor flor-footer"><img src="./flor-decor.png" alt=""></div>
+  <p>Feito com carinho, só para você ✦</p>
+</footer>
+
+<!-- =============================================
+     JAVASCRIPT
+     ============================================= -->
+<script>
+/* --------------------------------------------------
+   0. CONFIGURAÇÃO — edite apenas aqui
+   -------------------------------------------------- */
+const CONFIG = {
+  nome: 'Kakau', // ← Nome da garota (também ajuste no HTML acima)
+
+  typedPhrases: [
+    'Você faz bem sem tentar.',
+    'Tem coisas suas que a gente guarda.',
+    'O dia fica melhor quando você aparece.',
+    'Obrigado por ser você.',
+  ],
+
+  poem: [
+    { text: 'Você importa.', highlight: true },
+    { text: 'Não por algo grandioso —', highlight: false },
+    { text: 'pelo jeito simples como você trata as pessoas,', highlight: false },
+    { text: 'pelo cuidado que você tem sem perceber.', highlight: false },
+    { text: '', gap: true },
+    { text: 'Tem coisas em você que talvez você não veja:', highlight: false },
+    { text: 'a calma, a presença, a forma como você escuta.', highlight: true },
+    { text: 'Mas quem convive contigo vê.', highlight: false },
+    { text: '', gap: true },
+    { text: 'Você deixa marcas boas nas pessoas.', highlight: false },
+    { text: 'Não precisa fazer discurso nem ser perfeita.', highlight: false },
+    { text: 'Só de ser quem você é, já basta.', highlight: true },
+    { text: '', gap: true },
+    { text: 'Espero que um dia você enxergue', highlight: false },
+    { text: 'o quanto isso vale.', highlight: false },
+    { text: 'Porque de verdade — vale muito.', highlight: true },
+  ],
+  poemSign: {
+    line: 'Com carinho,',
+    name: 'Alguém que se sente grato por te conhecer',
+  },
+
+  refugioCartas: [
+    {
+      id: 'triste',
+      title: 'Quando estiver triste',
+      hint: 'Para os dias que pesam mais',
+      paragraphs: [
+        'Kakau, sei que hoje não está fácil. Não vou te dizer para sorrir ou fingir que está tudo bem — porque às vezes não está, e isso é humano.',
+        'O que quero que você saiba é que esse dia ruim não define quem você é. Você já passou por coisas difíceis antes e ainda está aqui. Isso diz muito sobre você, mesmo que agora pareça que não.',
+        'Lembra da sua gentileza? Da forma como você cuida das pessoas mesmo quando você mesma está cansada? Isso não some num dia triste. Continua sendo parte de quem você é.',
+        'Chora se precisar. Descansa. Não se cobre por estar assim. Amanhã pode ser diferente — e se não for, você ainda vai estar valendo a mesma coisa.',
+        'Estou pensando em você. De verdade.',
+      ],
+    },
+    {
+      id: 'ansiedade',
+      title: 'Quando a ansiedade aparecer',
+      hint: 'Para quando a cabeça não para',
+      paragraphs: [
+        'Kakau, respira comigo um instante. Não precisa resolver tudo agora. A ansiedade faz parecer que o mundo vai desabar, mas quase nunca desaba do jeito que ela promete.',
+        'Você tem uma calma natural — eu já vi isso em você, mesmo quando você não percebe. Seu olhar, seu jeito de estar presente. Isso ainda existe agora, mesmo com o coração acelerado.',
+        'Tenta focar em uma coisa de cada vez. O chão embaixo dos seus pés. O ar entrando e saindo. Não precisa controlar o que vem depois.',
+        'Você não está sozinha nisso. Tem gente que se importa com você — eu me importo. Quando passar, lembra que você aguentou de novo.',
+      ],
+    },
+    {
+      id: 'insegura',
+      title: 'Quando estiver insegura',
+      hint: 'Para quando a dúvida fala alto',
+      paragraphs: [
+        'Kakau, a insegurança mente. Ela sussurra que você não é capaz, que vai dar errado, que as pessoas vão perceber que você "não é tão boa assim". Mas quem convive com você vê outra coisa.',
+        'Você é inteligente de um jeito que surpreende. Percebe detalhes, conecta ideias, enxerga nuances. Isso não é comum.',
+        'Tem coragem em você também — do tipo quieto, que segue em frente sem fazer alarde. E tem gentileza, que faz as pessoas se sentirem bem perto de você.',
+        'Talvez hoje você não consiga enxergar isso. Tudo bem. Eu enxergo. E quando a dúvida passar, espero que você lembre: você já provou ser capaz muitas vezes. Isso conta.',
+      ],
+    },
+    {
+      id: 'bonita',
+      title: 'Quando achar que não é bonita',
+      hint: 'Para os dias em que o espelho mente',
+      paragraphs: [
+        'Kakau, deixa eu te contar uma coisa: bonito de verdade não é só o que aparece num espelho. É o sorriso genuíno que você dá. É a calma no seu olhar. É o jeito como você escuta alguém que precisa falar.',
+        'Tem uma beleza em você que não depende de filtro, de roupa, de dia bom. É a forma como você existe — presente, real, sem fingimento.',
+        'Se hoje você olhou no espelho e não gostou, saiba que isso acontece com todo mundo. Mas o que as pessoas guardam de você raramente é uma foto. É um momento. Uma conversa. Uma sensação de bem-estar.',
+        'Você é bonita, Kakau. Não do jeito de capa de revista — do jeito que importa. Do jeito que fica.',
+      ],
+    },
+    {
+      id: 'sozinha',
+      title: 'Quando se sentir sozinha',
+      hint: 'Para quando parece que ninguém está perto',
+      paragraphs: [
+        'Kakau, sei que a solidão dói de um jeito que é difícil explicar. Parece que o mundo segue girando e você ficou parada no meio, sem ninguém ao lado.',
+        'Mas eu quero que você saiba: mesmo quando parece que ninguém vê, tem alguém que pensa em você. Que se importa com como você está. Que ficaria triste se soubesse que você está se sentindo assim.',
+        'Você não precisa carregar tudo sozinha. Às vezes a gente se fecha — e tudo bem. Mas quando quiser, estenda a mão. Mande uma mensagem. Diga "não estou bem". Isso não te faz fraca.',
+        'Enquanto isso, fica aqui. Esta carta existe porque você importa. E importar não depende de estar perto fisicamente.',
+      ],
+    },
+    {
+      id: 'cansada',
+      title: 'Quando estiver cansada de tudo',
+      hint: 'Para quando não dá mais',
+      paragraphs: [
+        'Kakau, você tem carregado muito. Eu vejo — mesmo que você não fale. Você aguenta, segue, cuida dos outros, e muitas vezes esquece de cuidar de você.',
+        'Descansar não é desistir. Parar um pouco não significa que você falhou. Significa que você é humana.',
+        'Você não precisa dar conta de tudo hoje. Deixa algumas coisas para depois. Diz não se precisar. Deita se puder. O mundo não vai acabar se você pausar.',
+        'Você já fez o suficiente por hoje. De verdade. Permite-se respirar sem culpa.',
+      ],
+    },
+    {
+      id: 'suficiente',
+      title: 'Quando sentir que não é suficiente',
+      hint: 'Para quando a comparação dói',
+      paragraphs: [
+        'Kakau, quem te disse que você precisa ser mais? Mais produtiva, mais bonita, mais interessante, mais qualquer coisa? Porque do jeito que eu vejo, você já é demais em coisas que ninguém consegue fingir.',
+        'Você não precisa provar seu valor todo dia. Não precisa ser perfeita. Não precisa ser a melhor em tudo para merecer descanso, carinho, paz.',
+        'Tem gente que gosta de você exatamente como você é — com seus dias bons e ruins, com suas dúvidas, com sua forma única de estar no mundo.',
+        'Você é suficiente, Kakau. Não amanhã, quando melhorar. Agora. Neste exato momento, cansada, insegura ou triste — você ainda é suficiente.',
+      ],
+    },
+    {
+      id: 'coracao',
+      title: 'Quando algo machucar seu coração',
+      hint: 'Para quando a dor parece grande demais',
+      paragraphs: [
+        'Kakau, sinto muito que algo te machucou. Não vou minimizar — dor de coração é real, e dói de um jeito que ninguém deveria ter que aguentar sozinha.',
+        'Você tem todo direito de ficar mal. De chorar. De ficar com raiva. De não entender por que aconteceu. Ninguém deveria te apressar para "superar".',
+        'Mas quero te lembrar: o que te quebrou hoje não vai te definir para sempre. Você já passou por coisas antes. Já se reconstruiu. Vai se reconstruir de novo — no seu tempo, do seu jeito.',
+        'Cuida de você agora. Seja gentil consigo mesma como você seria com alguém que ama. Você merece esse cuidado.',
+      ],
+    },
+    {
+      id: 'desistir',
+      title: 'Quando quiser desistir',
+      hint: 'Para os dias mais escuros',
+      paragraphs: [
+        'Kakau, se você está lendo isso num dia muito difícil, quero que saiba: eu me importo com você. De verdade. Não como frase bonita — como alguém que conhece quem você é e não quer te perder.',
+        'Desistir parece a única saída quando tudo pesa demais. Mas antes de tomar qualquer decisão, respira. Fica aqui mais um pouco. Lê de novo se precisar.',
+        'Você já iluminou dias de outras pessoas sem perceber. Já fez diferença. Já foi a razão de alguém se sentir melhor. Isso não some porque hoje está escuro.',
+        'Se puder, fala com alguém de confiança. Um amigo, alguém da família, um profissional. Pedir ajuda é força, não fraqueza.',
+        'Você importa, Kakau. Mesmo agora. Mesmo assim.',
+      ],
+    },
+    {
+      id: 'algo-bom',
+      title: 'Quando precisar ouvir algo bom',
+      hint: 'Para quando falta luz',
+      paragraphs: [
+        'Kakau, às vezes a gente só precisa ouvir algo bom — sem motivo, sem ocasião especial. Então deixa eu te dizer algumas coisas simples:',
+        'Você faz bem às pessoas. Tem um jeito de estar presente que acalma. Quando você sorri de verdade, dá para ver que é genuíno.',
+        'Você é mais forte do que imagina. Já passou por dias ruins e continuou. Isso não é sorte — é você.',
+        'Tem coisas em você que eu guardo: a forma como você pensa, como você cuida, como você é real. Isso vale muito.',
+        'Espero que hoje, mesmo que só por um instante, algo disso chegue em você.',
+      ],
+    },
+    {
+      id: 'entender',
+      title: 'Quando ninguém parecer entender',
+      hint: 'Para quando você se sente incompreendida',
+      paragraphs: [
+        'Kakau, é frustrante quando você fala e parece que ninguém escuta de verdade. Quando explica o que sente e recebe de volta um "é frescura" ou um silêncio.',
+        'O que você sente é válido. Não precisa de permissão de ninguém para sentir. E não estar sendo compreendida agora não significa que o que você vive não importa.',
+        'Eu te entendo — ou pelo menos tento. Sei que você é complexa, que tem camadas, que nem sempre consegue colocar em palavras. E mesmo assim, o que você carrega merece respeito.',
+        'Não deixa ninguém te convencer de que você está errada por sentir. Você não está.',
+      ],
+    },
+    {
+      id: 'lembrar',
+      title: 'Apenas para lembrar quem você é',
+      hint: 'Para qualquer dia',
+      paragraphs: [
+        'Kakau, esta carta não é para um dia específico. É para quando você precisar lembrar.',
+        'Você é gentil — mesmo nos dias em que não percebe. É inteligente — de um jeito que surpreende quem conversa com você. É autêntica — não tenta ser o que os outros esperam.',
+        'Tem uma calma no seu olhar que eu nunca esqueci. Tem um sorriso que parece de verdade. Tem uma força quieto que segue em frente sem fazer barulho.',
+        'Você deixa marcas boas nas pessoas. Não precisa ser perfeita. Não precisa provar nada.',
+        'Quando esquecer, volta aqui. Esta carta vai continuar dizendo a mesma coisa: você é importante. Você é Kakau. E isso basta.',
+      ],
+    },
+  ],
+};
+
+/* --------------------------------------------------
+   1. PARTÍCULAS DE FUNDO (canvas global)
+   -------------------------------------------------- */
+(function initBgParticles() {
+  const canvas = document.getElementById('canvas-bg');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+  const isMobile = window.innerWidth < 640;
+  const N = isMobile ? 35 : 55;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x  = Math.random() * W;
+      this.y  = Math.random() * H;
+      this.vx = (Math.random() - 0.5) * 0.18;
+      this.vy = (Math.random() - 0.5) * 0.18;
+      this.r  = Math.random() * 1.5 + 0.3;
+      this.alpha = Math.random() * 0.4 + 0.05;
+      const roll = Math.random();
+      this.gold = roll > 0.55;
+      this.rose  = !this.gold && roll > 0.25;
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.gold
+        ? `rgba(196,163,90,${this.alpha})`
+        : this.rose
+          ? `rgba(122,155,130,${this.alpha * 0.8})`
+          : `rgba(74,107,82,${this.alpha * 0.5})`;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < N; i++) particles.push(new Particle());
+
+  // Linhas de conexão suaves (desligado no celular)
+  function drawConnections() {
+    if (isMobile) return;
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(196,163,90,${0.04 * (1 - dist / 100)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    drawConnections();
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* --------------------------------------------------
+   1b. LUZ SUAVE (partículas douradas)
+   -------------------------------------------------- */
+(function initLight() {
+  const canvas = document.getElementById('light-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const isMobile = window.innerWidth < 640;
+  const flakes = [];
+  const COUNT = isMobile ? 18 : 38;
+  let reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function drawMote(x, y, r, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#E8D5A3';
+    ctx.shadowBlur = r * 3;
+    ctx.shadowColor = 'rgba(196,163,90,0.4)';
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  class Mote {
+    constructor() { this.reset(true); }
+    reset(initial) {
+      this.x = Math.random() * W;
+      this.y = initial ? Math.random() * H : -10;
+      this.r = Math.random() * 1.8 + 0.4;
+      this.speed = Math.random() * 0.5 + 0.2;
+      this.alpha = Math.random() * 0.35 + 0.15;
+      this.drift = (Math.random() - 0.5) * 0.3;
+      this.wobble = Math.random() * Math.PI * 2;
+    }
+    update() {
+      this.wobble += 0.01;
+      this.y += this.speed;
+      this.x += this.drift + Math.sin(this.wobble) * 0.2;
+      if (this.y > H + 10) this.reset(false);
+    }
+    draw() { drawMote(this.x, this.y, this.r, this.alpha); }
+  }
+
+  for (let i = 0; i < COUNT; i++) flakes.push(new Mote());
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    if (!reduced) flakes.forEach(f => { f.update(); f.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* --------------------------------------------------
+   2. EFEITO DE DIGITAÇÃO NO HERO
+   -------------------------------------------------- */
+(function initTyped() {
+  const el = document.getElementById('typed-text');
+  const phrases = CONFIG.typedPhrases;
+  let pi = 0, ci = 0, deleting = false;
+  const cursor = '<span class="cursor-blink"></span>';
+
+  function type() {
+    const phrase = phrases[pi];
+    if (!deleting) {
+      ci++;
+      el.innerHTML = phrase.slice(0, ci) + cursor;
+      if (ci === phrase.length) { deleting = true; setTimeout(type, 2000); return; }
+      setTimeout(type, 55);
+    } else {
+      ci--;
+      el.innerHTML = phrase.slice(0, ci) + cursor;
+      if (ci === 0) {
+        deleting = false;
+        pi = (pi + 1) % phrases.length;
+        setTimeout(type, 400);
+        return;
+      }
+      setTimeout(type, 28);
+    }
+  }
+  setTimeout(type, 2200);
+})();
+
+/* --------------------------------------------------
+   3. SCROLL REVEAL (IntersectionObserver)
+   -------------------------------------------------- */
+(function initReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        // Para cards com stagger
+        if (entry.target.classList.contains('cards-grid')) {
+          const cards = entry.target.querySelectorAll('.card-razao');
+          cards.forEach((card, i) => {
+            setTimeout(() => card.classList.add('is-visible'), i * 120);
+          });
+        }
+        if (entry.target.classList.contains('refugio-grid')) {
+          const cards = entry.target.querySelectorAll('.refugio-card');
+          cards.forEach((card, i) => {
+            setTimeout(() => card.classList.add('is-visible'), i * 70);
+          });
+        }
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll(
+    '.section-eyebrow, .section-title, .divider, .reveal, ' +
+    '.carta-inner, .t-item, .interativa-desc, .btn-especial, ' +
+    '.cards-grid, .momento-wrap, .refugio-intro, .refugio-grid'
+  ).forEach(el => observer.observe(el));
+})();
+
+/* --------------------------------------------------
+   3b. REFÚGIO — cartas de acolhimento
+   -------------------------------------------------- */
+(function initRefugio() {
+  const grid      = document.getElementById('refugio-grid');
+  const overlay   = document.getElementById('refugio-overlay');
+  const backdrop  = document.getElementById('refugio-backdrop');
+  const titulo    = document.getElementById('refugio-titulo');
+  const corpo     = document.getElementById('refugio-corpo');
+  const btnFechar = document.getElementById('refugio-fechar');
+  if (!grid || !overlay) return;
+
+  const cartas = CONFIG.refugioCartas || [];
+
+  cartas.forEach(c => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'refugio-card';
+    btn.setAttribute('role', 'listitem');
+    btn.setAttribute('aria-label', 'Abrir carta: ' + c.title);
+    btn.innerHTML =
+      '<span class="refugio-card-icon" aria-hidden="true">🌿</span>' +
+      '<div><h3>' + c.title + '</h3><p>' + c.hint + '</p></div>';
+    btn.addEventListener('click', () => abrirCarta(c));
+    grid.appendChild(btn);
+  });
+
+  function abrirCarta(c) {
+    titulo.textContent = c.title;
+    corpo.innerHTML = c.paragraphs.map(p => '<p>' + p + '</p>').join('');
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    btnFechar.focus();
+  }
+
+  function fechar() {
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  btnFechar.addEventListener('click', fechar);
+  backdrop.addEventListener('click', fechar);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) fechar();
+  });
+})();
+
+/* --------------------------------------------------
+   4. OVERLAY — MENSAGEM ESPECIAL
+   -------------------------------------------------- */
+(function initOverlay() {
+  const overlay       = document.getElementById('overlay');
+  const overlayCanvas = document.getElementById('overlay-canvas');
+  const poemBody      = document.getElementById('poem-body');
+  const btnEspecial   = document.getElementById('btn-especial');
+  const btnFechar     = document.getElementById('btn-fechar');
+
+  let overlayAnim, revealTimers = [];
+  const oFlakes = [];
+  const isMobile = window.innerWidth < 640;
+
+  function buildPoem() {
+    poemBody.innerHTML = '';
+    const stanza = document.createElement('div');
+    stanza.className = 'poem-stanza';
+
+    CONFIG.poem.forEach((line, i) => {
+      const el = document.createElement('p');
+      el.className = 'poem-line';
+      if (line.gap) {
+        el.classList.add('gap');
+        el.innerHTML = '&nbsp;';
+      } else {
+        el.textContent = line.text;
+        if (line.highlight) el.classList.add('highlight');
+      }
+      el.dataset.index = i;
+      stanza.appendChild(el);
+    });
+
+    const sign = document.createElement('div');
+    sign.className = 'poem-sign';
+    sign.innerHTML = `<p>${CONFIG.poemSign.line}</p><strong>${CONFIG.poemSign.name}</strong>`;
+
+    poemBody.appendChild(stanza);
+    poemBody.appendChild(sign);
+  }
+
+  function revealPoem() {
+    revealTimers.forEach(clearTimeout);
+    revealTimers = [];
+
+    const lines = poemBody.querySelectorAll('.poem-line');
+    const sign = poemBody.querySelector('.poem-sign');
+    lines.forEach(l => l.classList.remove('visible'));
+    if (sign) sign.classList.remove('visible');
+
+    lines.forEach((line, i) => {
+      revealTimers.push(setTimeout(() => {
+        line.classList.add('visible');
+        if (i % 3 === 0) line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 600 + i * 520));
+    });
+
+    revealTimers.push(setTimeout(() => {
+      if (sign) sign.classList.add('visible');
+    }, 600 + lines.length * 520 + 400));
+  }
+
+  function initOverlayLight() {
+    const W = overlayCanvas.width  = window.innerWidth;
+    const H = overlayCanvas.height = window.innerHeight;
+    oFlakes.length = 0;
+    const count = isMobile ? 18 : 35;
+
+    for (let i = 0; i < count; i++) {
+      oFlakes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 2 + 0.5,
+        vy: Math.random() * 0.8 + 0.3,
+        vx: (Math.random() - 0.5) * 0.3,
+        alpha: Math.random() * 0.5 + 0.2,
+        W, H
+      });
+    }
+  }
+
+  function drawOverlayLight() {
+    const ctx = overlayCanvas.getContext('2d');
+    const W = overlayCanvas.width;
+    const H = overlayCanvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    oFlakes.forEach(f => {
+      f.y += f.vy;
+      f.x += f.vx;
+      if (f.y > H + 5) { f.y = -5; f.x = Math.random() * W; }
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(232,213,163,${f.alpha})`;
+      ctx.fill();
+    });
+
+    overlayAnim = requestAnimationFrame(drawOverlayLight);
+  }
+
+  buildPoem();
+
+  btnEspecial.addEventListener('click', () => {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    initOverlayLight();
+    drawOverlayLight();
+    revealPoem();
+  });
+
+  btnFechar.addEventListener('click', () => {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    cancelAnimationFrame(overlayAnim);
+    revealTimers.forEach(clearTimeout);
+    revealTimers = [];
+    oFlakes.length = 0;
+    poemBody.querySelectorAll('.poem-line, .poem-sign').forEach(el => el.classList.remove('visible'));
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) btnFechar.click();
+  });
+})();
+
+/* --------------------------------------------------
+   6. EFEITO PARALLAX SUAVE NO HERO
+   -------------------------------------------------- */
+(function initParallax() {
+  const hero = document.getElementById('hero');
+  const glow = hero.querySelector('.hero-glow');
+  let ticking = false;
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrolled = window.scrollY;
+        glow.style.transform = `translateY(${scrolled * 0.3}px)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
+
+/* --------------------------------------------------
+   7. INSERIR NOME DA CONFIG NO HTML
+   -------------------------------------------------- */
+(function applyName() {
+  const nameEl = document.getElementById('hero-nome');
+  if (nameEl && CONFIG.nome) nameEl.textContent = CONFIG.nome;
+})();
+</script>
+
+</body>
+</html>
