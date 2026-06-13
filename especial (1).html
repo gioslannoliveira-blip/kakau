@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Você — Algo Especial</title>
+
+<style>
+/* =============================================
+   VARIÁVEIS E RESET GLOBAL
+   ============================================= */
+:root {
+  --nome: "Kakau"; /* ← EDITE AQUI O NOME */
+
+  --c-creme:    #F9F4EF;
+  --c-rose:     #E8C5C0;
+  --c-blush:    #D4A5A0;
+  --c-muted:    #B8907A;
+  --c-terra:    #8C6155;
+  --c-deep:     #3D2B26;
+  --c-gold:     #C9A96E;
+  --c-gold-lt:  #E8D5A3;
+  --c-bg:       #0F0A09;
+  --c-bg2:      #1A1008;
+  --c-text:     #F0E8E0;
+  --c-muted-t:  rgba(240,232,224,0.55);
+
+  --f-display: 'Cormorant Garamond', 'Georgia', serif;
+  --f-body:    'Inter', 'Helvetica Neue', sans-serif;
+
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--f-body);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* Importar fontes via @import dentro do CSS */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500&display=swap');
+
+/* =============================================
+   PARTÍCULAS DE FUNDO (canvas global)
+   ============================================= */
+#canvas-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* =============================================
+   PAINEL DE MÚSICA
+   ============================================= */
+#music-panel {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: min(520px, calc(100% - 2rem));
+  padding: 0.85rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid rgba(201,169,110,0.35);
+  background: rgba(15,10,9,0.82);
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+
+.music-panel-header {
+  font-family: var(--f-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--c-gold);
+  text-align: center;
+}
+
+.music-panel-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.music-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.music-title {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--c-creme);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-status {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--c-muted-t);
+  margin-top: 0.15rem;
+  display: block;
+}
+
+.music-status.is-playing { color: var(--c-gold-lt); }
+
+.music-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.music-progress {
+  flex: 1;
+  height: 4px;
+  background: rgba(201,169,110,0.15);
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.music-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--c-gold), var(--c-gold-lt));
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.music-time {
+  font-size: 0.6rem;
+  color: var(--c-muted-t);
+  letter-spacing: 0.05em;
+  min-width: 72px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.music-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.music-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.music-volume-wrap svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--c-gold);
+  fill: none;
+  flex-shrink: 0;
+}
+
+.music-volume {
+  width: 100%;
+  max-width: 100px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(201,169,110,0.15);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.music-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  cursor: pointer;
+}
+
+.music-volume::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  border: none;
+  cursor: pointer;
+}
+
+#music-play-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.35);
+  background: rgba(201,169,110,0.08);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.3s, transform 0.2s, background 0.3s;
+  color: var(--c-gold);
+}
+
+#music-play-btn:hover {
+  border-color: var(--c-gold);
+  background: rgba(201,169,110,0.15);
+  transform: scale(1.06);
+}
+
+#music-play-btn svg { width: 14px; height: 14px; }
+
+@media (max-width: 480px) {
+  #music-panel { top: 0.75rem; padding: 0.75rem; }
+  .music-volume { max-width: 72px; }
+}
+
+/* =============================================
+   SEÇÃO 1 — TELA INICIAL
+   ============================================= */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(201,169,110,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 30% 70%, rgba(212,165,160,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-ornament {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--c-gold), transparent);
+  margin: 0 auto 2rem;
+  opacity: 0;
+  animation: fadeIn 1.2s 0.5s var(--ease-smooth) forwards;
+}
+
+.hero-eyebrow {
+  font-family: var(--f-body);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  opacity: 0;
+  animation: fadeUp 1s 0.8s var(--ease-smooth) forwards;
+}
+
+/* ← NOME DA GAROTA — edite a variável --nome no :root acima */
+.hero-name {
+  font-family: var(--f-display);
+  font-size: clamp(4rem, 14vw, 9rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  color: var(--c-creme);
+  margin: 0.5rem 0 1rem;
+  opacity: 0;
+  animation: fadeUp 1.2s 1s var(--ease-smooth) forwards;
+}
+
+.hero-name span {
+  background: linear-gradient(135deg, #E8D5A3 0%, #C9A96E 40%, #B8907A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-tagline {
+  font-family: var(--f-display);
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--c-muted-t);
+  max-width: 520px;
+  margin: 0 auto 0.75rem;
+  opacity: 0;
+  animation: fadeUp 1s 1.3s var(--ease-smooth) forwards;
+}
+
+.hero-typed {
+  font-family: var(--f-body);
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  font-weight: 300;
+  color: var(--c-gold-lt);
+  letter-spacing: 0.04em;
+  min-height: 1.5em;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 1s 1.6s var(--ease-smooth) forwards;
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--c-gold);
+  vertical-align: middle;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+}
+
+.btn-continuar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 2.2rem;
+  border: 1px solid rgba(201,169,110,0.4);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--c-gold);
+  font-family: var(--f-body);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.35s, border-color 0.35s, color 0.35s, transform 0.2s;
+  opacity: 0;
+  animation: fadeUp 1s 2s var(--ease-smooth) forwards;
+  text-decoration: none;
+}
+.btn-continuar:hover {
+  background: rgba(201,169,110,0.1);
+  border-color: var(--c-gold);
+  color: var(--c-gold-lt);
+  transform: translateY(-2px);
+}
+.btn-continuar svg { width: 16px; height: 16px; stroke: currentColor; fill: none; transition: transform 0.3s; }
+.btn-continuar:hover svg { transform: translateX(4px); }
+
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0;
+  animation: fadeIn 1s 3s var(--ease-smooth) forwards;
+  color: var(--c-muted-t);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--c-gold), transparent);
+  animation: scrollPulse 2s infinite;
+}
+
+/* =============================================
+   SEÇÕES GERAIS
+   ============================================= */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 6rem 2rem;
+}
+
+.section-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-eyebrow {
+  font-family: var(--f-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  margin-bottom: 0.75rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth);
+}
+
+.section-title {
+  font-family: var(--f-display);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.15;
+  color: var(--c-creme);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.9s 0.1s var(--ease-smooth), transform 0.9s 0.1s var(--ease-smooth);
+}
+
+.divider {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(to right, var(--c-gold), transparent);
+  margin-bottom: 2rem;
+  opacity: 0;
+  transition: opacity 1s 0.2s;
+}
+
+.is-visible .section-eyebrow,
+.is-visible .section-title,
+.is-visible .divider {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =============================================
+   SEÇÃO 2 — MOTIVOS
+   ============================================= */
+#razoes { background: var(--c-bg2); }
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.card-razao {
+  position: relative;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(201,169,110,0.12);
+  border-radius: 4px;
+  padding: 2rem 1.75rem;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth),
+              border-color 0.35s, background 0.35s;
+}
+.card-razao.is-visible { opacity: 1; transform: translateY(0); }
+.card-razao:hover {
+  background: rgba(201,169,110,0.05);
+  border-color: rgba(201,169,110,0.3);
+}
+.card-razao::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--c-gold), transparent);
+  transform: scaleX(0);
+  transition: transform 0.5s var(--ease-smooth);
+}
+.card-razao:hover::before { transform: scaleX(1); }
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--c-gold);
+  font-size: 1.5rem;
+}
+.card-icon svg { width: 28px; height: 28px; stroke: var(--c-gold); fill: none; stroke-width: 1.5; }
+
+.card-razao h3 {
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-creme);
+  margin-bottom: 0.6rem;
+}
+.card-razao p {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--c-muted-t);
+  line-height: 1.75;
+}
+.card-num {
+  position: absolute;
+  bottom: 1rem;
+  right: 1.25rem;
+  font-family: var(--f-display);
+  font-size: 3.5rem;
+  font-weight: 600;
+  color: rgba(201,169,110,0.06);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* =============================================
+   SEÇÃO 3 — LINHA DO TEMPO
+   ============================================= */
+#timeline { background: var(--c-bg); }
+
+.timeline-line {
+  position: relative;
+}
+.timeline-line::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(201,169,110,0.25), transparent);
+  transform: translateX(-50%);
+}
+
+.t-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth);
+}
+.t-item:nth-child(odd) { flex-direction: row; transform: translateX(-30px); }
+.t-item:nth-child(even) { flex-direction: row-reverse; transform: translateX(30px); }
+.t-item.is-visible { opacity: 1; transform: translateX(0); }
+
+.t-content {
+  flex: 1;
+  max-width: calc(50% - 2.5rem);
+}
+.t-item:nth-child(odd) .t-content { text-align: right; }
+.t-item:nth-child(even) .t-content { text-align: left; }
+
+.t-date {
+  font-family: var(--f-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  margin-bottom: 0.4rem;
+}
+.t-content h3 {
+  font-family: var(--f-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-creme);
+  margin-bottom: 0.5rem;
+}
+.t-content p {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--c-muted-t);
+  line-height: 1.75;
+}
+
+.t-dot {
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--c-gold);
+  background: var(--c-bg);
+  margin-top: 0.35rem;
+  align-self: flex-start;
+}
+.t-dot::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.t-item.is-visible .t-dot::after { opacity: 1; }
+
+/* Mobile timeline */
+@media (max-width: 640px) {
+  .timeline-line::before { left: 14px; }
+  .t-item, .t-item:nth-child(even) { flex-direction: row; transform: translateX(-20px); }
+  .t-content, .t-item:nth-child(odd) .t-content { text-align: left; max-width: 100%; }
+  .t-dot { flex-shrink: 0; }
+}
+
+/* =============================================
+   SEÇÃO 4 — GALERIA
+   ============================================= */
+#galeria { background: var(--c-bg2); }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.gallery-item {
+  position: relative;
+  aspect-ratio: 1;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,169,110,0.12);
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth),
+              border-color 0.35s;
+}
+.gallery-item.is-visible { opacity: 1; transform: scale(1); }
+.gallery-item:hover { border-color: rgba(201,169,110,0.3); }
+.gallery-item:nth-child(1) { grid-column: span 2; aspect-ratio: 2/1; }
+
+.gallery-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(201,169,110,0.04), rgba(212,165,160,0.04));
+  color: var(--c-muted-t);
+  transition: color 0.35s, background 0.35s;
+}
+.gallery-item:hover .gallery-placeholder {
+  color: var(--c-gold);
+  background: rgba(201,169,110,0.07);
+}
+.gallery-placeholder svg { width: 28px; height: 28px; stroke: currentColor; fill: none; stroke-width: 1; opacity: 0.5; }
+.gallery-placeholder span { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
+
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(201,169,110,0.08);
+  opacity: 0;
+  transition: opacity 0.35s;
+  display: flex; align-items: center; justify-content: center;
+}
+.gallery-item:hover .gallery-overlay { opacity: 1; }
+.gallery-overlay-icon { width: 36px; height: 36px; stroke: var(--c-gold-lt); fill: none; }
+
+/* Se o usuário quiser inserir imagem real */
+.gallery-item img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-smooth);
+}
+.gallery-item:hover img { transform: scale(1.04); }
+
+.gallery-hint {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.78rem;
+  color: var(--c-muted-t);
+  letter-spacing: 0.05em;
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-item:nth-child(1) { grid-column: span 2; }
+}
+
+/* =============================================
+   SEÇÃO 5 — CARTA
+   ============================================= */
+#carta { background: var(--c-bg); overflow: hidden; }
+
+.carta-wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.carta-ornament-tl,
+.carta-ornament-br {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.carta-ornament-tl { top: -1rem; left: -1rem; border-top: 1px solid var(--c-gold); border-left: 1px solid var(--c-gold); }
+.carta-ornament-br { bottom: -1rem; right: -1rem; border-bottom: 1px solid var(--c-gold); border-right: 1px solid var(--c-gold); }
+
+.carta-inner {
+  padding: 3.5rem 3rem;
+  background: rgba(255,255,255,0.018);
+  border: 1px solid rgba(201,169,110,0.14);
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s var(--ease-smooth), transform 1s var(--ease-smooth);
+}
+.carta-inner.is-visible { opacity: 1; transform: translateY(0); }
+
+.carta-saudacao {
+  font-family: var(--f-display);
+  font-size: 1.6rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--c-gold-lt);
+  margin-bottom: 2rem;
+}
+.carta-inner p {
+  font-size: 1rem;
+  font-weight: 300;
+  color: rgba(240,232,224,0.8);
+  line-height: 1.95;
+  margin-bottom: 1.4rem;
+}
+.carta-inner p em {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 1.08em;
+  color: var(--c-creme);
+}
+.carta-assinatura {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(201,169,110,0.12);
+}
+.carta-assinatura p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--c-muted-t);
+}
+.carta-assinatura strong {
+  display: block;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--c-gold-lt);
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 600px) {
+  .carta-inner { padding: 2.5rem 1.75rem; }
+}
+
+/* =============================================
+   SEÇÃO 6 — INTERATIVA
+   ============================================= */
+#interativa {
+  background: var(--c-bg2);
+  text-align: center;
+}
+
+.interativa-desc {
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--c-muted-t);
+  max-width: 420px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.8;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s 0.2s var(--ease-smooth), transform 0.8s 0.2s var(--ease-smooth);
+}
+.interativa-desc.is-visible { opacity: 1; transform: translateY(0); }
+
+.btn-especial {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.1rem 2.6rem;
+  background: transparent;
+  border: 1px solid rgba(201,169,110,0.4);
+  border-radius: 2px;
+  color: var(--c-gold-lt);
+  font-family: var(--f-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.4s, border-color 0.4s, transform 0.2s;
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  transition: opacity 0.8s 0.35s var(--ease-smooth),
+              transform 0.8s 0.35s var(--ease-smooth),
+              color 0.4s, border-color 0.4s;
+}
+.btn-especial.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+.btn-especial::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(201,169,110,0.0), rgba(201,169,110,0.15));
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.btn-especial:hover { border-color: var(--c-gold); color: var(--c-gold-lt); }
+.btn-especial:hover::before { opacity: 1; }
+.btn-especial:active { transform: scale(0.98); }
+.btn-especial-icon { font-size: 1.1rem; transition: transform 0.35s var(--ease-spring); }
+.btn-especial:hover .btn-especial-icon { transform: rotate(15deg) scale(1.15); }
+
+/* =============================================
+   OVERLAY CINEMATOGRÁFICO
+   ============================================= */
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(8,5,4,0);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 1.2s var(--ease-smooth);
+}
+#overlay.active {
+  background: rgba(8,5,4,0.97);
+  pointer-events: all;
+}
+
+#overlay-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s;
+}
+#overlay.active #overlay-canvas { opacity: 1; }
+
+.overlay-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2rem;
+  max-width: 620px;
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  transition: opacity 0.8s, transform 0.8s var(--ease-smooth);
+}
+#overlay.active .overlay-content {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition-delay: 0.8s;
+}
+
+.overlay-msg {
+  font-family: var(--f-display);
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--c-creme);
+  margin-bottom: 1rem;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth);
+  line-height: 1.3;
+}
+.overlay-msg.show { opacity: 1; transform: translateY(0); }
+
+.overlay-sep {
+  width: 30px;
+  height: 1px;
+  background: var(--c-gold);
+  margin: 1.25rem auto;
+  opacity: 0;
+  transform: scaleX(0);
+  transition: opacity 0.6s, transform 0.6s var(--ease-smooth);
+}
+.overlay-sep.show { opacity: 1; transform: scaleX(1); }
+
+.overlay-final {
+  font-family: var(--f-display);
+  font-size: clamp(1rem, 3vw, 1.35rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-gold-lt);
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 1.2s var(--ease-smooth), transform 1.2s var(--ease-smooth);
+  margin-bottom: 2.5rem;
+}
+.overlay-final.show { opacity: 1; transform: translateY(0); }
+
+.btn-fechar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.8rem;
+  border: 1px solid rgba(201,169,110,0.3);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--c-muted-t);
+  font-family: var(--f-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
+  opacity: 0;
+  transition: opacity 0.6s, color 0.3s, border-color 0.3s;
+}
+.btn-fechar.show { opacity: 1; }
+.btn-fechar:hover { color: var(--c-gold); border-color: rgba(201,169,110,0.5); }
+
+/* =============================================
+   RODAPÉ
+   ============================================= */
+footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 3rem 2rem;
+  border-top: 1px solid rgba(201,169,110,0.08);
+  background: var(--c-bg);
+}
+footer p {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: rgba(240,232,224,0.2);
+  font-family: var(--f-display);
+  font-style: italic;
+}
+
+/* =============================================
+   ANIMAÇÕES KEYFRAMES
+   ============================================= */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes scrollPulse {
+  0%   { transform: scaleY(1); opacity: 0.6; }
+  50%  { transform: scaleY(1.3); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0.6; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* Smooth scroll reveal */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth); }
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+/* Acessibilidade: reduzir movimento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- =============================================
+     CANVAS FUNDO (partículas globais)
+     ============================================= -->
+<canvas id="canvas-bg"></canvas>
+
+<!-- =============================================
+     PAINEL DE MÚSICA — Back To Friends
+     Back To Friends — sombr
+     ============================================= -->
+<audio id="bg-audio" src="ytmp3free.cc_sombr-back-to-friends-official-video-youtubemp3free.org.mp3" preload="metadata" loop></audio>
+
+<div id="music-panel" role="region" aria-label="Player musical">
+  <div class="music-panel-header">🎵 Back To Friends</div>
+
+  <div class="music-panel-row">
+    <div class="music-info">
+      <span class="music-title" id="music-title">Back To Friends</span>
+      <span class="music-status" id="music-status">Pausada</span>
+    </div>
+  </div>
+
+  <div class="music-progress-wrap">
+    <div class="music-progress" id="music-progress" role="slider" aria-label="Progresso da música" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+      <div class="music-progress-fill" id="music-progress-fill"></div>
+    </div>
+    <span class="music-time" id="music-time">0:00 / 0:00</span>
+  </div>
+
+  <div class="music-controls-row">
+    <div class="music-volume-wrap">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M11 5L6 9H2v6h4l5 4V5z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="range" class="music-volume" id="music-volume" min="0" max="1" step="0.01" value="0.7" aria-label="Volume">
+    </div>
+    <button id="music-play-btn" title="Play / Pause" aria-label="Play ou pausar">
+      <svg id="icon-play" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="8,5 19,12 8,19" fill="var(--c-gold)"/>
+      </svg>
+      <svg id="icon-pause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <rect x="6" y="4" width="4" height="16" rx="1" fill="var(--c-gold)"/>
+        <rect x="14" y="4" width="4" height="16" rx="1" fill="var(--c-gold)"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- =============================================
+     SEÇÃO 1 — HERO
+     ============================================= -->
+<section id="hero" aria-label="Tela inicial">
+  <div class="hero-glow"></div>
+  <div class="hero-ornament"></div>
+
+  <p class="hero-eyebrow">Uma homenagem para</p>
+
+  <!-- ← EDITE O NOME ABAIXO -->
+  <h1 class="hero-name"><span id="hero-nome">Kakau</span></h1>
+
+  <p class="hero-tagline">Tem pessoas que chegam sem avisar e ficam para sempre — não no lugar onde a gente quer, mas em algum canto do coração que a gente nem sabia que existia.</p>
+
+  <p class="hero-typed" id="typed-text"><span class="cursor-blink"></span></p>
+
+  <a href="#razoes" class="btn-continuar">
+    Continuar
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 12h14M12 5l7 7-7 7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+
+  <div class="hero-scroll-hint">
+    <div class="scroll-line"></div>
+    <span>role</span>
+  </div>
+</section>
+
+<!-- =============================================
+     SEÇÃO 2 — MOTIVOS
+     ============================================= -->
+<section id="razoes" aria-label="Motivos pelos quais ela é especial">
+  <div class="section-inner">
+    <p class="section-eyebrow">O que a torna única</p>
+    <h2 class="section-title">Motivos pelos quais<br>você é extraordinária</h2>
+    <div class="divider"></div>
+
+    <div class="cards-grid">
+
+      <!-- Card 1 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
+        </div>
+        <h3>A forma como você cuida</h3>
+        <p>Você cuida das pessoas de um jeito que elas percebem — mas que você faz sem pensar, como se fosse natural. E talvez seja. Mas pra quem recebe, não é pouca coisa. É tudo.</p>
+        <span class="card-num">01</span>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </div>
+        <h3>O que você faz com os outros</h3>
+        <p>Perto de você, as pessoas ficam mais leves. É difícil de explicar como isso funciona — mas funciona. Tem uma energia em você que desarmou gente que não tinha intenção nenhuma de ser desarmada.</p>
+        <span class="card-num">02</span>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-13v5l3 3"/></svg>
+        </div>
+        <h3>Como você enfrenta as coisas</h3>
+        <p>Você já passou por coisas que poderiam ter te quebrado. Mas não quebraram. Tem uma força quieta em você — não a força de quem não sente, mas a de quem sente tudo e vai assim mesmo.</p>
+        <span class="card-num">03</span>
+      </article>
+
+      <!-- Card 4 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <h3>Ser você mesma, sem pedir licença</h3>
+        <p>Você não tenta agradar todo mundo. Não se dobra pra caber no que os outros esperam. Isso parece simples — mas não é. A maioria das pessoas passa a vida inteira sem conseguir.</p>
+        <span class="card-num">04</span>
+      </article>
+
+      <!-- Card 5 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3>Como você pensa e fala</h3>
+        <p>Conversar com você é diferente. Você tem um jeito de enxergar as coisas que surpreende — não porque é rebuscado, mas porque é verdadeiro. Cada conversa deixa alguma coisa nova na cabeça da gente.</p>
+        <span class="card-num">05</span>
+      </article>
+
+      <!-- Card 6 -->
+      <article class="card-razao">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <h3>O jeito que você sorri</h3>
+        <p>O seu sorriso não é de quem quer agradar. É de quem realmente achou graça. E quando ele aparece de verdade, para tudo ao redor. A gente nota. A gente guarda.</p>
+        <span class="card-num">06</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     SEÇÃO 3 — LINHA DO TEMPO
+     Edite os itens abaixo para personalizar
+     ============================================= -->
+<section id="timeline" aria-label="Momentos especiais">
+  <div class="section-inner">
+    <p class="section-eyebrow">Momentos que ficaram</p>
+    <h2 class="section-title">Uma linha do tempo<br>de memórias guardadas</h2>
+    <div class="divider"></div>
+
+    <div class="timeline-line" style="margin-top: 3.5rem;">
+
+      <!-- ← EDITE CADA t-item ABAIXO -->
+
+      <div class="t-item">
+        <div class="t-content">
+          <p class="t-date">O primeiro momento</p>
+          <h3>Quando você surgiu</h3>
+          <p>A primeira impressão foi de uma pessoa fora do comum. Não deu para ignorar. Algo ali — na forma como você se movia pelo mundo — ficou registrado imediatamente.</p>
+        </div>
+        <div class="t-dot"></div>
+        <div style="flex:1;max-width:calc(50% - 2.5rem)"></div>
+      </div>
+
+      <div class="t-item">
+        <div style="flex:1;max-width:calc(50% - 2.5rem)"></div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <p class="t-date">Uma conversa inesquecível</p>
+          <h3>As palavras certas</h3>
+          <p>Houve um momento em que as palavras que você disse chegaram no lugar certo, na hora certa. E ficaram. Esse é o tipo de coisa que não se esquece, não importa quanto tempo passe.</p>
+        </div>
+      </div>
+
+      <div class="t-item">
+        <div class="t-content">
+          <p class="t-date">Em um dia comum</p>
+          <h3>Que deixou de ser comum</h3>
+          <p>Existem dias que parecem iguais a todos os outros — e então você aparece, e eles se tornam especiais. Não pelo que acontece, mas pela sua presença dentro deles.</p>
+        </div>
+        <div class="t-dot"></div>
+        <div style="flex:1;max-width:calc(50% - 2.5rem)"></div>
+      </div>
+
+      <div class="t-item">
+        <div style="flex:1;max-width:calc(50% - 2.5rem)"></div>
+        <div class="t-dot"></div>
+        <div class="t-content">
+          <p class="t-date">Hoje e sempre</p>
+          <h3>O que permanece</h3>
+          <p>Com o tempo, as memórias ganham contornos mais suaves. Mas a certeza de que você é uma pessoa extraordinária só fica mais clara. Isso não muda.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<!-- =============================================
+     SEÇÃO 5 — CARTA
+     ============================================= -->
+<section id="carta" aria-label="Carta especial">
+  <div class="section-inner">
+    <p class="section-eyebrow">Palavras guardadas</p>
+    <h2 class="section-title">Uma carta</h2>
+    <div class="divider"></div>
+
+    <div class="carta-wrapper">
+      <div class="carta-ornament-tl"></div>
+      <div class="carta-ornament-br"></div>
+
+      <div class="carta-inner">
+        <!-- ← EDITE O NOME AQUI TAMBÉM -->
+        <p class="carta-saudacao">Querida Kakau,</p>
+
+        <p>Existem coisas que a gente sente mas nem sempre encontra as palavras certas para dizer — e às vezes o medo de soar exagerado faz a gente ficar em silêncio quando devia falar. Então deixa eu tentar.</p>
+
+        <p>Você é <em>o tipo de pessoa rara</em> que muda alguma coisa em tudo que toca — não de propósito, não por esforço, mas simplesmente por ser quem você é. Tem uma qualidade em você que é difícil de nomear: é uma espécie de autenticidade que não pede permissão, que não precisa se justificar.</p>
+
+        <p>O que mais me impressiona não é nenhuma qualidade isolada — é a <em>combinação de tudo ao mesmo tempo</em>: a inteligência com a gentileza, a força com a leveza, a seriedade com o sorriso. Poucas pessoas conseguem carregar essas coisas juntas sem que uma apague a outra.</p>
+
+        <p>Você faz diferença. Não da forma barulhenta, que todo mundo nota na hora — mas do jeito quieto e profundo, que fica. Que muda perspectivas. Que faz o mundo ao redor ser um pouco melhor só por você estar nele.</p>
+
+        <p>E eu quis que você soubesse disso. Não com intenção de causar desconforto nem de criar expectativas. Apenas porque algumas coisas merecem ser ditas, e você merece ouvi-las.</p>
+
+        <p><em>Obrigado por existir do jeito que você existe.</em></p>
+
+        <div class="carta-assinatura">
+          <p>Com admiração e respeito genuínos,</p>
+          <strong>Alguém que tem sorte de te conhecer</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =============================================
+     SEÇÃO 6 — INTERATIVA
+     ============================================= -->
+<section id="interativa" aria-label="Algo especial para você">
+  <div class="section-inner">
+    <p class="section-eyebrow">Só para você</p>
+    <h2 class="section-title reveal">Uma última coisa</h2>
+    <div class="divider reveal"></div>
+
+    <p class="interativa-desc">
+      Clique no botão abaixo quando estiver pronta — tem algo especial esperando por você.
+    </p>
+
+    <button class="btn-especial" id="btn-especial" aria-label="Ver algo especial">
+      <span class="btn-especial-icon">✦</span>
+      Quero ver algo especial
+    </button>
+  </div>
+</section>
+
+<!-- =============================================
+     OVERLAY CINEMATOGRÁFICO
+     ============================================= -->
+<div id="overlay" role="dialog" aria-modal="true" aria-label="Mensagem especial">
+  <canvas id="overlay-canvas"></canvas>
+  <div class="overlay-content">
+    <div id="overlay-msgs"></div>
+    <button class="btn-fechar" id="btn-fechar">✕ &nbsp; Fechar</button>
+  </div>
+</div>
+
+<!-- =============================================
+     RODAPÉ
+     ============================================= -->
+<footer>
+  <p>Feito com cuidado e admiração genuína ✦</p>
+</footer>
+
+<!-- =============================================
+     JAVASCRIPT
+     ============================================= -->
+<script>
+/* --------------------------------------------------
+   0. CONFIGURAÇÃO — edite apenas aqui
+   -------------------------------------------------- */
+const CONFIG = {
+  nome: 'Kakau', // ← Nome da garota (também ajuste no HTML acima)
+
+  typedPhrases: [
+    'Você é o tipo de pessoa que a gente não esquece.',
+    'Pensar em você sempre dói um pouco — do jeito bom.',
+    'Você faz falta mesmo quando está por perto.',
+    'Não sei explicar. Só sei que é você.',
+    'Te conhecer mudou alguma coisa em mim.',
+  ],
+
+  // Mensagens do overlay cinematográfico
+  overlayMsgs: [
+    'Sabe aquela sensação de olhar pra alguém e sentir que o tempo para?',
+    'É isso que acontece com você.',
+    'Não é algo que eu escolhi sentir.',
+    'Simplesmente aconteceu — e ficou.',
+    'E tudo bem. Porque te conhecer, do jeito que foi, já valeu.',
+    'Você é uma das coisas mais bonitas que já aconteceram na minha vida.',
+  ],
+
+  overlayFinal: '"Independentemente do caminho que a vida escolha para a gente, você vai continuar sendo uma das pessoas mais especiais que já existiram no meu mundo."',
+
+  musicTitle: 'Back To Friends',
+  musicSrc: 'ytmp3free.cc_sombr-back-to-friends-official-video-youtubemp3free.org.mp3',
+};
+
+/* --------------------------------------------------
+   1. PARTÍCULAS DE FUNDO (canvas global)
+   -------------------------------------------------- */
+(function initBgParticles() {
+  const canvas = document.getElementById('canvas-bg');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+  const N = 80;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x  = Math.random() * W;
+      this.y  = Math.random() * H;
+      this.vx = (Math.random() - 0.5) * 0.18;
+      this.vy = (Math.random() - 0.5) * 0.18;
+      this.r  = Math.random() * 1.5 + 0.3;
+      this.alpha = Math.random() * 0.4 + 0.05;
+      this.gold = Math.random() > 0.6;
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.gold
+        ? `rgba(201,169,110,${this.alpha})`
+        : `rgba(240,232,224,${this.alpha * 0.5})`;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < N; i++) particles.push(new Particle());
+
+  // Linhas de conexão suaves
+  function drawConnections() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(201,169,110,${0.04 * (1 - dist / 100)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    drawConnections();
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* --------------------------------------------------
+   2. EFEITO DE DIGITAÇÃO NO HERO
+   -------------------------------------------------- */
+(function initTyped() {
+  const el = document.getElementById('typed-text');
+  const phrases = CONFIG.typedPhrases;
+  let pi = 0, ci = 0, deleting = false;
+  const cursor = '<span class="cursor-blink"></span>';
+
+  function type() {
+    const phrase = phrases[pi];
+    if (!deleting) {
+      ci++;
+      el.innerHTML = phrase.slice(0, ci) + cursor;
+      if (ci === phrase.length) { deleting = true; setTimeout(type, 2000); return; }
+      setTimeout(type, 55);
+    } else {
+      ci--;
+      el.innerHTML = phrase.slice(0, ci) + cursor;
+      if (ci === 0) {
+        deleting = false;
+        pi = (pi + 1) % phrases.length;
+        setTimeout(type, 400);
+        return;
+      }
+      setTimeout(type, 28);
+    }
+  }
+  setTimeout(type, 2200);
+})();
+
+/* --------------------------------------------------
+   3. SCROLL REVEAL (IntersectionObserver)
+   -------------------------------------------------- */
+(function initReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        // Para cards com stagger
+        if (entry.target.classList.contains('cards-grid')) {
+          const cards = entry.target.querySelectorAll('.card-razao');
+          cards.forEach((card, i) => {
+            setTimeout(() => card.classList.add('is-visible'), i * 120);
+          });
+        }
+        if (entry.target.classList.contains('gallery-grid')) {
+          const items = entry.target.querySelectorAll('.gallery-item');
+          items.forEach((item, i) => {
+            setTimeout(() => item.classList.add('is-visible'), i * 100);
+          });
+        }
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll(
+    '.section-eyebrow, .section-title, .divider, .reveal, ' +
+    '.carta-inner, .t-item, .interativa-desc, .btn-especial, ' +
+    '.cards-grid, .gallery-grid'
+  ).forEach(el => observer.observe(el));
+})();
+
+/* --------------------------------------------------
+   4. PAINEL DE MÚSICA — Back To Friends
+   -------------------------------------------------- */
+(function initMusic() {
+  const audio       = document.getElementById('bg-audio');
+  const playBtn     = document.getElementById('music-play-btn');
+  const iconPlay    = document.getElementById('icon-play');
+  const iconPause   = document.getElementById('icon-pause');
+  const statusEl    = document.getElementById('music-status');
+  const titleEl     = document.getElementById('music-title');
+  const progress    = document.getElementById('music-progress');
+  const progressFill = document.getElementById('music-progress-fill');
+  const timeEl      = document.getElementById('music-time');
+  const volumeSlider = document.getElementById('music-volume');
+
+  audio.src = CONFIG.musicSrc;
+  titleEl.textContent = CONFIG.musicTitle;
+  audio.volume = parseFloat(volumeSlider.value);
+
+  function formatTime(sec) {
+    if (!isFinite(sec) || sec < 0) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  function updateUI() {
+    const current = audio.currentTime;
+    const duration = audio.duration || 0;
+    const pct = duration ? (current / duration) * 100 : 0;
+
+    progressFill.style.width = `${pct}%`;
+    progress.setAttribute('aria-valuenow', Math.round(pct));
+    timeEl.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
+  }
+
+  function setPlayingState(playing) {
+    iconPlay.style.display  = playing ? 'none'  : 'block';
+    iconPause.style.display = playing ? 'block' : 'none';
+    statusEl.textContent    = playing ? 'Tocando' : 'Pausada';
+    statusEl.classList.toggle('is-playing', playing);
+  }
+
+  function togglePlay() {
+    if (audio.paused) {
+      audio.play().then(() => setPlayingState(true)).catch(() => setPlayingState(false));
+    } else {
+      audio.pause();
+      setPlayingState(false);
+    }
+  }
+
+  playBtn.addEventListener('click', togglePlay);
+
+  audio.addEventListener('timeupdate', updateUI);
+  audio.addEventListener('loadedmetadata', updateUI);
+  audio.addEventListener('ended', () => setPlayingState(false));
+
+  progress.addEventListener('click', (e) => {
+    const rect = progress.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    if (audio.duration) audio.currentTime = ratio * audio.duration;
+  });
+
+  progress.addEventListener('keydown', (e) => {
+    if (!audio.duration) return;
+    const step = audio.duration * 0.05;
+    if (e.key === 'ArrowRight') audio.currentTime = Math.min(audio.duration, audio.currentTime + step);
+    if (e.key === 'ArrowLeft')  audio.currentTime = Math.max(0, audio.currentTime - step);
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    audio.volume = parseFloat(volumeSlider.value);
+  });
+
+  setPlayingState(false);
+  updateUI();
+})();
+
+/* --------------------------------------------------
+   5. OVERLAY CINEMATOGRÁFICO
+   -------------------------------------------------- */
+(function initOverlay() {
+  const overlay     = document.getElementById('overlay');
+  const overlayCanvas = document.getElementById('overlay-canvas');
+  const msgsDiv     = document.getElementById('overlay-msgs');
+  const btnEspecial = document.getElementById('btn-especial');
+  const btnFechar   = document.getElementById('btn-fechar');
+
+  let overlayCtx, overlayAnim;
+  const oParticles = [];
+
+  // Partículas do overlay (brilhos dourados)
+  function initOverlayCanvas() {
+    const W = overlayCanvas.width  = window.innerWidth;
+    const H = overlayCanvas.height = window.innerHeight;
+    overlayCtx = overlayCanvas.getContext('2d');
+
+    for (let i = 0; i < 120; i++) {
+      oParticles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 2.5 + 0.5,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -(Math.random() * 0.6 + 0.1),
+        alpha: Math.random() * 0.6 + 0.2,
+        life: Math.random(),
+        decay: Math.random() * 0.003 + 0.001,
+        gold: Math.random() > 0.4,
+        W, H
+      });
+    }
+  }
+
+  function drawOverlayParticles() {
+    const W = overlayCanvas.width;
+    const H = overlayCanvas.height;
+    overlayCtx.clearRect(0, 0, W, H);
+
+    oParticles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.life -= p.decay;
+      if (p.life <= 0) {
+        p.x = Math.random() * W;
+        p.y = H + 10;
+        p.life = 1;
+        p.alpha = Math.random() * 0.6 + 0.2;
+      }
+      const a = p.alpha * Math.min(p.life * 2, 1);
+      overlayCtx.beginPath();
+      overlayCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      overlayCtx.fillStyle = p.gold
+        ? `rgba(201,169,110,${a})`
+        : `rgba(240,232,224,${a * 0.4})`;
+      overlayCtx.fill();
+
+      // brilho
+      if (p.r > 1.5) {
+        overlayCtx.beginPath();
+        overlayCtx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+        overlayCtx.fillStyle = `rgba(201,169,110,${a * 0.06})`;
+        overlayCtx.fill();
+      }
+    });
+
+    overlayAnim = requestAnimationFrame(drawOverlayParticles);
+  }
+
+  function buildMsg(text, type) {
+    if (type === 'sep') {
+      const sep = document.createElement('div');
+      sep.className = 'overlay-sep';
+      msgsDiv.appendChild(sep);
+      return sep;
+    }
+    if (type === 'final') {
+      const d = document.createElement('p');
+      d.className = 'overlay-final';
+      d.textContent = text;
+      msgsDiv.appendChild(d);
+      return d;
+    }
+    const d = document.createElement('p');
+    d.className = 'overlay-msg';
+    d.textContent = text;
+    msgsDiv.appendChild(d);
+    return d;
+  }
+
+  async function runSequence() {
+    const msgs   = CONFIG.overlayMsgs;
+    const final  = CONFIG.overlayFinal;
+    const delay  = ms => new Promise(r => setTimeout(r, ms));
+
+    await delay(900); // aguarda overlay escurecer
+
+    for (const msg of msgs) {
+      const el = buildMsg(msg, 'text');
+      await delay(50);
+      el.classList.add('show');
+      await delay(1600);
+    }
+
+    await delay(400);
+    const sep = buildMsg('', 'sep');
+    await delay(50);
+    sep.classList.add('show');
+    await delay(700);
+
+    const finalEl = buildMsg(final, 'final');
+    await delay(50);
+    finalEl.classList.add('show');
+
+    await delay(1200);
+    btnFechar.classList.add('show');
+  }
+
+  btnEspecial.addEventListener('click', () => {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    initOverlayCanvas();
+    drawOverlayParticles();
+    runSequence();
+  });
+
+  btnFechar.addEventListener('click', () => {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    cancelAnimationFrame(overlayAnim);
+    oParticles.length = 0;
+    // Limpa msgs para próxima abertura
+    setTimeout(() => {
+      msgsDiv.innerHTML = '';
+      btnFechar.classList.remove('show');
+    }, 800);
+  });
+
+  // Fechar com Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      btnFechar.click();
+    }
+  });
+})();
+
+/* --------------------------------------------------
+   6. EFEITO PARALLAX SUAVE NO HERO
+   -------------------------------------------------- */
+(function initParallax() {
+  const hero = document.getElementById('hero');
+  const glow = hero.querySelector('.hero-glow');
+  let ticking = false;
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrolled = window.scrollY;
+        glow.style.transform = `translateY(${scrolled * 0.3}px)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
+
+/* --------------------------------------------------
+   7. INSERIR NOME DA CONFIG NO HTML
+   -------------------------------------------------- */
+(function applyName() {
+  const nameEl = document.getElementById('hero-nome');
+  if (nameEl && CONFIG.nome) nameEl.textContent = CONFIG.nome;
+})();
+</script>
+
+</body>
+</html>
