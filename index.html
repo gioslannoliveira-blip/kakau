@@ -13,15 +13,16 @@
   --nome: "Kakau"; /* ← EDITE AQUI O NOME */
 
   --c-creme:    #F9F4EF;
-  --c-rose:     #E8C5C0;
-  --c-blush:    #D4A5A0;
+  --c-rose:     #E8B4B8;
+  --c-blush:    #D4899A;
+  --c-lavender: #9B8AA5;
   --c-muted:    #B8907A;
   --c-terra:    #8C6155;
   --c-deep:     #3D2B26;
   --c-gold:     #C9A96E;
   --c-gold-lt:  #E8D5A3;
-  --c-bg:       #0F0A09;
-  --c-bg2:      #1A1008;
+  --c-bg:       #0D0812;
+  --c-bg2:      #150E1A;
   --c-text:     #F0E8E0;
   --c-muted-t:  rgba(240,232,224,0.55);
 
@@ -55,182 +56,75 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.6;
+  opacity: 0.55;
+}
+
+#hearts-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
 }
 
 /* =============================================
-   PAINEL DE MÚSICA
+   BADGE — Back To Friends (somente visual)
    ============================================= */
-#music-panel {
+#music-now-playing {
   position: fixed;
   top: 1rem;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
-  width: min(520px, calc(100% - 2rem));
-  padding: 0.85rem 1.1rem;
-  border-radius: 6px;
-  border: 1px solid rgba(201,169,110,0.35);
-  background: rgba(15,10,9,0.82);
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 1.15rem;
+  border-radius: 999px;
+  border: 1px solid rgba(232,180,184,0.28);
+  background: rgba(13,8,18,0.78);
   backdrop-filter: blur(14px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-}
-
-.music-panel-header {
-  font-family: var(--f-body);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  color: var(--c-gold);
-  text-align: center;
-}
-
-.music-panel-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.music-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.music-title {
-  display: block;
-  font-family: var(--f-display);
-  font-size: 0.95rem;
-  font-style: italic;
-  color: var(--c-creme);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.music-status {
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--c-muted-t);
-  margin-top: 0.15rem;
-  display: block;
-}
-
-.music-status.is-playing { color: var(--c-gold-lt); }
-
-.music-progress-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-.music-progress {
-  flex: 1;
-  height: 4px;
-  background: rgba(201,169,110,0.15);
-  border-radius: 2px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.music-progress-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--c-gold), var(--c-gold-lt));
-  border-radius: 2px;
+  box-shadow:
+    0 0 20px rgba(232,180,184,0.12),
+    0 0 40px rgba(155,138,165,0.08);
+  animation: musicBadgeGlow 3.5s ease-in-out infinite;
   pointer-events: none;
 }
 
-.music-time {
-  font-size: 0.6rem;
-  color: var(--c-muted-t);
-  letter-spacing: 0.05em;
-  min-width: 72px;
-  text-align: right;
-  flex-shrink: 0;
+.music-now-icon { font-size: 0.85rem; line-height: 1; }
+
+.music-now-text {
+  font-family: var(--f-display);
+  font-size: 0.88rem;
+  font-style: italic;
+  font-weight: 300;
+  color: #F0D0D4;
+  letter-spacing: 0.06em;
 }
 
-.music-controls-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.music-volume-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  flex: 1;
-}
-
-.music-volume-wrap svg {
-  width: 14px;
-  height: 14px;
-  stroke: var(--c-gold);
-  fill: none;
-  flex-shrink: 0;
-}
-
-.music-volume {
-  width: 100%;
-  max-width: 100px;
-  height: 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: rgba(201,169,110,0.15);
-  border-radius: 2px;
-  cursor: pointer;
-}
-
-.music-volume::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
+.music-now-pulse {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: var(--c-gold);
-  cursor: pointer;
+  background: var(--c-blush);
+  box-shadow: 0 0 10px rgba(232,180,184,0.85);
+  animation: musicPulse 1.5s ease-in-out infinite;
 }
 
-.music-volume::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--c-gold);
-  border: none;
-  cursor: pointer;
+@keyframes musicBadgeGlow {
+  0%, 100% {
+    box-shadow: 0 0 18px rgba(232,180,184,0.10), 0 0 36px rgba(155,138,165,0.06);
+    border-color: rgba(232,180,184,0.22);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(232,180,184,0.28), 0 0 56px rgba(155,138,165,0.14);
+    border-color: rgba(232,180,184,0.42);
+  }
 }
 
-#music-play-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid rgba(201,169,110,0.35);
-  background: rgba(201,169,110,0.08);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: border-color 0.3s, transform 0.2s, background 0.3s;
-  color: var(--c-gold);
-}
-
-#music-play-btn:hover {
-  border-color: var(--c-gold);
-  background: rgba(201,169,110,0.15);
-  transform: scale(1.06);
-}
-
-#music-play-btn svg { width: 14px; height: 14px; }
-
-@media (max-width: 480px) {
-  #music-panel { top: 0.75rem; padding: 0.75rem; }
-  .music-volume { max-width: 72px; }
+@keyframes musicPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%       { transform: scale(1.35); opacity: 1; }
 }
 
 /* =============================================
@@ -253,8 +147,10 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(201,169,110,0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 30% at 30% 70%, rgba(212,165,160,0.06) 0%, transparent 60%);
+    radial-gradient(ellipse 65% 55% at 50% 35%, rgba(155,138,165,0.14) 0%, transparent 68%),
+    radial-gradient(ellipse 50% 40% at 75% 65%, rgba(232,180,184,0.10) 0%, transparent 58%),
+    radial-gradient(ellipse 45% 35% at 25% 70%, rgba(212,137,154,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 50% 80%, rgba(201,169,110,0.05) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -293,7 +189,7 @@ body {
 }
 
 .hero-name span {
-  background: linear-gradient(135deg, #E8D5A3 0%, #C9A96E 40%, #B8907A 100%);
+  background: linear-gradient(135deg, #F0D0D4 0%, #E8B4B8 35%, #C9A96E 70%, #9B8AA5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -610,92 +506,7 @@ section {
 }
 
 /* =============================================
-   SEÇÃO 4 — GALERIA
-   ============================================= */
-#galeria { background: var(--c-bg2); }
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto;
-  gap: 1rem;
-  margin-top: 3rem;
-}
-
-.gallery-item {
-  position: relative;
-  aspect-ratio: 1;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(201,169,110,0.12);
-  border-radius: 3px;
-  overflow: hidden;
-  cursor: pointer;
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth),
-              border-color 0.35s;
-}
-.gallery-item.is-visible { opacity: 1; transform: scale(1); }
-.gallery-item:hover { border-color: rgba(201,169,110,0.3); }
-.gallery-item:nth-child(1) { grid-column: span 2; aspect-ratio: 2/1; }
-
-.gallery-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  background: linear-gradient(135deg, rgba(201,169,110,0.04), rgba(212,165,160,0.04));
-  color: var(--c-muted-t);
-  transition: color 0.35s, background 0.35s;
-}
-.gallery-item:hover .gallery-placeholder {
-  color: var(--c-gold);
-  background: rgba(201,169,110,0.07);
-}
-.gallery-placeholder svg { width: 28px; height: 28px; stroke: currentColor; fill: none; stroke-width: 1; opacity: 0.5; }
-.gallery-placeholder span { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
-
-.gallery-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(201,169,110,0.08);
-  opacity: 0;
-  transition: opacity 0.35s;
-  display: flex; align-items: center; justify-content: center;
-}
-.gallery-item:hover .gallery-overlay { opacity: 1; }
-.gallery-overlay-icon { width: 36px; height: 36px; stroke: var(--c-gold-lt); fill: none; }
-
-/* Se o usuário quiser inserir imagem real */
-.gallery-item img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s var(--ease-smooth);
-}
-.gallery-item:hover img { transform: scale(1.04); }
-
-.gallery-hint {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.78rem;
-  color: var(--c-muted-t);
-  letter-spacing: 0.05em;
-  font-style: italic;
-}
-
-@media (max-width: 600px) {
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-  .gallery-item:nth-child(1) { grid-column: span 2; }
-}
-
-/* =============================================
-   SEÇÃO 5 — CARTA
+   SEÇÃO 4 — CARTA
    ============================================= */
 #carta { background: var(--c-bg); overflow: hidden; }
 
@@ -862,9 +673,9 @@ section {
 .overlay-content {
   position: relative;
   z-index: 1;
-  text-align: center;
-  padding: 2rem;
-  max-width: 620px;
+  padding: 1.5rem 2rem 2rem;
+  max-width: 960px;
+  width: 100%;
   opacity: 0;
   transform: translateY(20px) scale(0.98);
   transition: opacity 0.8s, transform 0.8s var(--ease-smooth);
@@ -872,54 +683,131 @@ section {
 #overlay.active .overlay-content {
   opacity: 1;
   transform: translateY(0) scale(1);
-  transition-delay: 0.8s;
+  transition-delay: 0.5s;
 }
 
-.overlay-msg {
+.lyrics-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.lyrics-header h2 {
   font-family: var(--f-display);
-  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
   font-weight: 300;
   font-style: italic;
-  color: var(--c-creme);
-  margin-bottom: 1rem;
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth);
-  line-height: 1.3;
+  color: var(--c-rose);
+  text-shadow: 0 0 20px rgba(255,60,80,0.35);
 }
-.overlay-msg.show { opacity: 1; transform: translateY(0); }
 
-.overlay-sep {
-  width: 30px;
-  height: 1px;
-  background: var(--c-gold);
-  margin: 1.25rem auto;
-  opacity: 0;
-  transform: scaleX(0);
-  transition: opacity 0.6s, transform 0.6s var(--ease-smooth);
+.lyrics-header p {
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--c-muted-t);
+  margin-top: 0.35rem;
 }
-.overlay-sep.show { opacity: 1; transform: scaleX(1); }
 
-.overlay-final {
+.lyrics-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2rem;
+  max-height: min(62vh, 520px);
+  overflow-y: auto;
+  padding: 0.5rem 0.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,60,80,0.3) transparent;
+}
+
+.lyrics-col-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255,80,90,0.55);
+  margin-bottom: 0.75rem;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(to bottom, rgba(8,5,4,0.95), transparent);
+  padding-bottom: 0.5rem;
+  z-index: 2;
+}
+
+.lyric-line {
   font-family: var(--f-display);
-  font-size: clamp(1rem, 3vw, 1.35rem);
-  font-weight: 400;
+  font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+  font-weight: 300;
   font-style: italic;
-  color: var(--c-gold-lt);
-  line-height: 1.5;
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 1.2s var(--ease-smooth), transform 1.2s var(--ease-smooth);
-  margin-bottom: 2.5rem;
+  line-height: 1.45;
+  padding: 0.55rem 0.85rem;
+  margin-bottom: 0.35rem;
+  border-radius: 6px;
+  color: rgba(240,232,224,0.22);
+  opacity: 0.35;
+  transform: scale(0.98);
+  transition:
+    color 0.35s var(--ease-smooth),
+    opacity 0.35s var(--ease-smooth),
+    transform 0.35s var(--ease-smooth),
+    text-shadow 0.35s var(--ease-smooth),
+    box-shadow 0.35s var(--ease-smooth),
+    background 0.35s var(--ease-smooth);
 }
-.overlay-final.show { opacity: 1; transform: translateY(0); }
+
+.lyric-line.past {
+  opacity: 0.5;
+  color: rgba(240,232,224,0.4);
+}
+
+.lyric-line.active {
+  opacity: 1;
+  transform: scale(1.04);
+  color: #FFE8EA;
+  background: rgba(180,15,30,0.22);
+  box-shadow:
+    0 0 20px rgba(255,40,60,0.55),
+    0 0 45px rgba(255,25,50,0.4),
+    0 0 70px rgba(220,15,35,0.25),
+    inset 0 0 25px rgba(255,60,80,0.12);
+  text-shadow:
+    0 0 8px rgba(255,80,95,1),
+    0 0 18px rgba(255,50,70,0.95),
+    0 0 36px rgba(255,30,55,0.8),
+    0 0 60px rgba(200,10,30,0.6);
+  animation: lyricPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes lyricPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(255,40,60,0.5),
+      0 0 45px rgba(255,25,50,0.35),
+      inset 0 0 25px rgba(255,60,80,0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 28px rgba(255,50,70,0.75),
+      0 0 60px rgba(255,30,55,0.55),
+      0 0 90px rgba(220,15,35,0.35),
+      inset 0 0 30px rgba(255,80,90,0.18);
+  }
+}
+
+@media (max-width: 640px) {
+  .lyrics-columns {
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-height: 65vh;
+  }
+  .lyrics-col-pt { margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,60,80,0.15); }
+  .overlay-content { padding: 1rem 1.25rem 1.5rem; }
+}
 
 .btn-fechar {
-  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.8rem;
-  border: 1px solid rgba(201,169,110,0.3);
+  border: 1px solid rgba(255,60,80,0.35);
   border-radius: 2px;
   background: transparent;
   color: var(--c-muted-t);
@@ -928,12 +816,16 @@ section {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color 0.3s, border-color 0.3s;
-  opacity: 0;
-  transition: opacity 0.6s, color 0.3s, border-color 0.3s;
+  margin: 1.5rem auto 0;
+  display: flex;
+  width: fit-content;
+  transition: color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
-.btn-fechar.show { opacity: 1; }
-.btn-fechar:hover { color: var(--c-gold); border-color: rgba(201,169,110,0.5); }
+.btn-fechar:hover {
+  color: #FFB0B8;
+  border-color: rgba(255,60,80,0.6);
+  box-shadow: 0 0 20px rgba(255,40,60,0.25);
+}
 
 /* =============================================
    RODAPÉ
@@ -995,48 +887,15 @@ footer p {
      CANVAS FUNDO (partículas globais)
      ============================================= -->
 <canvas id="canvas-bg"></canvas>
+<canvas id="hearts-canvas"></canvas>
 
-<!-- =============================================
-     PAINEL DE MÚSICA — Back To Friends
-     Back To Friends — sombr
-     ============================================= -->
-<audio id="bg-audio" src="ytmp3free.cc_sombr-back-to-friends-official-video-youtubemp3free.org.mp3" preload="metadata" loop></audio>
+<!-- Música — inicia automaticamente (sem controles) -->
+<audio id="bg-audio" preload="auto" loop playsinline></audio>
 
-<div id="music-panel" role="region" aria-label="Player musical">
-  <div class="music-panel-header">🎵 Back To Friends</div>
-
-  <div class="music-panel-row">
-    <div class="music-info">
-      <span class="music-title" id="music-title">Back To Friends</span>
-      <span class="music-status" id="music-status">Pausada</span>
-    </div>
-  </div>
-
-  <div class="music-progress-wrap">
-    <div class="music-progress" id="music-progress" role="slider" aria-label="Progresso da música" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
-      <div class="music-progress-fill" id="music-progress-fill"></div>
-    </div>
-    <span class="music-time" id="music-time">0:00 / 0:00</span>
-  </div>
-
-  <div class="music-controls-row">
-    <div class="music-volume-wrap">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M11 5L6 9H2v6h4l5 4V5z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <input type="range" class="music-volume" id="music-volume" min="0" max="1" step="0.01" value="0.7" aria-label="Volume">
-    </div>
-    <button id="music-play-btn" title="Play / Pause" aria-label="Play ou pausar">
-      <svg id="icon-play" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="8,5 19,12 8,19" fill="var(--c-gold)"/>
-      </svg>
-      <svg id="icon-pause" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none">
-        <rect x="6" y="4" width="4" height="16" rx="1" fill="var(--c-gold)"/>
-        <rect x="14" y="4" width="4" height="16" rx="1" fill="var(--c-gold)"/>
-      </svg>
-    </button>
-  </div>
+<div id="music-now-playing" aria-hidden="true">
+  <span class="music-now-icon">🎵</span>
+  <span class="music-now-text">Back To Friends</span>
+  <span class="music-now-pulse"></span>
 </div>
 
 <!-- =============================================
@@ -1051,7 +910,7 @@ footer p {
   <!-- ← EDITE O NOME ABAIXO -->
   <h1 class="hero-name"><span id="hero-nome">Kakau</span></h1>
 
-  <p class="hero-tagline">Tem pessoas que chegam sem avisar e ficam para sempre — não no lugar onde a gente quer, mas em algum canto do coração que a gente nem sabia que existia.</p>
+  <p class="hero-tagline">Existem pessoas que chegam à vida de uma forma tão única que o mundo antes delas parece incompleto.</p>
 
   <p class="hero-typed" id="typed-text"><span class="cursor-blink"></span></p>
 
@@ -1084,8 +943,8 @@ footer p {
         <div class="card-icon">
           <svg viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
         </div>
-        <h3>A forma como você cuida</h3>
-        <p>Você cuida das pessoas de um jeito que elas percebem — mas que você faz sem pensar, como se fosse natural. E talvez seja. Mas pra quem recebe, não é pouca coisa. É tudo.</p>
+        <h3>A sua gentileza</h3>
+        <p>Existe algo raro em pessoas que tratam o mundo com leveza, mesmo quando o mundo não merece. Você tem esse dom — e ele toca quem está por perto de formas que você talvez nem perceba.</p>
         <span class="card-num">01</span>
       </article>
 
@@ -1094,8 +953,8 @@ footer p {
         <div class="card-icon">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </div>
-        <h3>O que você faz com os outros</h3>
-        <p>Perto de você, as pessoas ficam mais leves. É difícil de explicar como isso funciona — mas funciona. Tem uma energia em você que desarmou gente que não tinha intenção nenhuma de ser desarmada.</p>
+        <h3>A sua luz própria</h3>
+        <p>Algumas pessoas iluminam os ambientes que entram — não pela necessidade de chamar atenção, mas porque sua presença simplesmente aquece. Você é assim: uma luz que não grita, mas que não passa despercebida.</p>
         <span class="card-num">02</span>
       </article>
 
@@ -1104,8 +963,8 @@ footer p {
         <div class="card-icon">
           <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-13v5l3 3"/></svg>
         </div>
-        <h3>Como você enfrenta as coisas</h3>
-        <p>Você já passou por coisas que poderiam ter te quebrado. Mas não quebraram. Tem uma força quieta em você — não a força de quem não sente, mas a de quem sente tudo e vai assim mesmo.</p>
+        <h3>A sua força silenciosa</h3>
+        <p>Tem uma coragem em você que não precisa ser anunciada. É o tipo de força que carrega peso sem reclamar, que segue em frente mesmo nos dias difíceis. Isso é admirável demais para não ser dito.</p>
         <span class="card-num">03</span>
       </article>
 
@@ -1114,8 +973,8 @@ footer p {
         <div class="card-icon">
           <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </div>
-        <h3>Ser você mesma, sem pedir licença</h3>
-        <p>Você não tenta agradar todo mundo. Não se dobra pra caber no que os outros esperam. Isso parece simples — mas não é. A maioria das pessoas passa a vida inteira sem conseguir.</p>
+        <h3>A sua autenticidade</h3>
+        <p>Viver sendo verdadeiramente você mesma é mais raro do que parece. Há uma integridade em quem você é — uma recusa silenciosa em ser quem os outros esperam — que merece o mais profundo respeito.</p>
         <span class="card-num">04</span>
       </article>
 
@@ -1124,8 +983,8 @@ footer p {
         <div class="card-icon">
           <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </div>
-        <h3>Como você pensa e fala</h3>
-        <p>Conversar com você é diferente. Você tem um jeito de enxergar as coisas que surpreende — não porque é rebuscado, mas porque é verdadeiro. Cada conversa deixa alguma coisa nova na cabeça da gente.</p>
+        <h3>A sua inteligência</h3>
+        <p>A maneira como você enxerga as coisas, conecta ideias e encontra nuances que outros ignoram é algo que ficou guardado. Conversar com você é sempre mais rico do que a pessoa esperava quando chegou.</p>
         <span class="card-num">05</span>
       </article>
 
@@ -1134,8 +993,8 @@ footer p {
         <div class="card-icon">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
         </div>
-        <h3>O jeito que você sorri</h3>
-        <p>O seu sorriso não é de quem quer agradar. É de quem realmente achou graça. E quando ele aparece de verdade, para tudo ao redor. A gente nota. A gente guarda.</p>
+        <h3>O seu sorriso</h3>
+        <p>Tem coisas no mundo que a gente se lembra sem esforço — e o seu sorriso é uma delas. Não porque é bonito (e é), mas porque ele parece genuíno. Parece você.</p>
         <span class="card-num">06</span>
       </article>
 
@@ -1201,10 +1060,8 @@ footer p {
   </div>
 </section>
 
-
-
 <!-- =============================================
-     SEÇÃO 5 — CARTA
+     SEÇÃO 4 — CARTA
      ============================================= -->
 <section id="carta" aria-label="Carta especial">
   <div class="section-inner">
@@ -1265,10 +1122,23 @@ footer p {
 <!-- =============================================
      OVERLAY CINEMATOGRÁFICO
      ============================================= -->
-<div id="overlay" role="dialog" aria-modal="true" aria-label="Mensagem especial">
+<div id="overlay" role="dialog" aria-modal="true" aria-label="Letra de Back To Friends">
   <canvas id="overlay-canvas"></canvas>
   <div class="overlay-content">
-    <div id="overlay-msgs"></div>
+    <div class="lyrics-header">
+      <h2>🎵 Back To Friends</h2>
+      <p>sincronizado com a música</p>
+    </div>
+    <div class="lyrics-columns">
+      <div class="lyrics-col lyrics-col-en">
+        <p class="lyrics-col-label">Original</p>
+        <div id="lyrics-en"></div>
+      </div>
+      <div class="lyrics-col lyrics-col-pt">
+        <p class="lyrics-col-label">Tradução</p>
+        <div id="lyrics-pt"></div>
+      </div>
+    </div>
     <button class="btn-fechar" id="btn-fechar">✕ &nbsp; Fechar</button>
   </div>
 </div>
@@ -1291,27 +1161,50 @@ const CONFIG = {
   nome: 'Kakau', // ← Nome da garota (também ajuste no HTML acima)
 
   typedPhrases: [
-    'Você é o tipo de pessoa que a gente não esquece.',
-    'Pensar em você sempre dói um pouco — do jeito bom.',
-    'Você faz falta mesmo quando está por perto.',
-    'Não sei explicar. Só sei que é você.',
-    'Te conhecer mudou alguma coisa em mim.',
+    'Você não é comum. Nunca foi.',
+    'O mundo é melhor com você nele.',
+    'Algumas pessoas são inesquecíveis — você é uma delas.',
+    'Obrigado por ser quem você é.',
   ],
-
-  // Mensagens do overlay cinematográfico
-  overlayMsgs: [
-    'Sabe aquela sensação de olhar pra alguém e sentir que o tempo para?',
-    'É isso que acontece com você.',
-    'Não é algo que eu escolhi sentir.',
-    'Simplesmente aconteceu — e ficou.',
-    'E tudo bem. Porque te conhecer, do jeito que foi, já valeu.',
-    'Você é uma das coisas mais bonitas que já aconteceram na minha vida.',
-  ],
-
-  overlayFinal: '"Independentemente do caminho que a vida escolha para a gente, você vai continuar sendo uma das pessoas mais especiais que já existiram no meu mundo."',
 
   musicTitle: 'Back To Friends',
-  musicSrc: 'ytmp3free.cc_sombr-back-to-friends-official-video-youtubemp3free.org.mp3',
+  musicSrc: './back-to-friends.mp3',
+
+  // Ajuste fino se a letra não bater com o áudio (ex: -1.5 ou +0.8)
+  lyricsOffset: -1.2,
+
+  lyrics: [
+    { start: 23.0,  en: 'Touch my body tender',                                      pt: 'Toque o meu corpo com carinho' },
+    { start: 27.6,  en: "'Cause the feeling makes me weak",                           pt: 'Porque essa sensação me deixa fraco' },
+    { start: 33.1,  en: 'Kicking off the covers',                                    pt: 'Jogo os lençóis de lado' },
+    { start: 37.7,  en: "I see the ceiling while you're looking down at me",         pt: 'Fico olhando para o teto enquanto você olha para mim' },
+    { start: 43.8,  en: 'How can we go back to being friends',                       pt: 'Como podemos voltar a ser amigos' },
+    { start: 48.8,  en: 'When we just shared a bed?',                                pt: 'Quando já dividimos uma cama?' },
+    { start: 54.1,  en: 'How can you look at me and pretend',                        pt: 'Como você pode olhar para mim e fingir' },
+    { start: 59.2,  en: "I'm someone you've never met?",                             pt: 'Que eu sou alguém que você não conhece?' },
+    { start: 64.2,  en: 'It was last December',                                      pt: 'Era Dezembro passado' },
+    { start: 68.7,  en: "You were layin' on my chest",                               pt: 'Você estava deitada no meu peito' },
+    { start: 74.3,  en: 'I still remember',                                          pt: 'Ainda me lembro' },
+    { start: 79.1,  en: 'I was scared to take a breath',                             pt: 'Eu estava com medo de respirar' },
+    { start: 82.5,  en: "Didn't want you to move your head",                         pt: 'Não queria que você movesse a cabeça' },
+    { start: 85.5,  en: 'How can we go back to being friends',                       pt: 'Como podemos voltar a ser amigos' },
+    { start: 90.2,  en: 'When we just shared a bed? (Yeah)',                         pt: 'Quando já dividimos uma cama? (É)' },
+    { start: 95.6,  en: 'How can you look at me and pretend',                        pt: 'Como você pode olhar para mim e fingir' },
+    { start: 100.1, en: "I'm someone you've never met?",                             pt: 'Que eu sou alguém que você não conhece?' },
+    { start: 105.9, en: 'The devil in your eyes',                                    pt: 'O diabo nos seus olhos' },
+    { start: 112.0, en: "Won't deny the lies you've sold",                           pt: 'Não nega as mentiras que você já contou' },
+    { start: 118.7, en: "I'm holding on too tight",                                  pt: 'Estou me agarrando com todas as minhas forças' },
+    { start: 122.4, en: 'While you let go, this is casual',                          pt: 'Enquanto você não faz esforço algum, isso aqui é casual' },
+    { start: 136.7, en: 'How can we go back to being friends',                       pt: 'Como podemos voltar a ser amigos' },
+    { start: 141.8, en: 'When we just shared a bed? (Yeah)',                         pt: 'Quando já dividimos uma cama? (É)' },
+    { start: 147.1, en: 'How can you look at me and pretend',                        pt: 'Como você pode olhar para mim e fingir' },
+    { start: 151.9, en: "I'm someone you've never met?",                             pt: 'Que eu sou alguém que você não conhece?' },
+    { start: 157.2, en: 'How can we go back to being friends',                       pt: 'Como podemos voltar a ser amigos' },
+    { start: 162.2, en: 'When we just shared a bed? (Yeah)',                         pt: 'Quando já dividimos uma cama? (É)' },
+    { start: 167.8, en: 'How can you look at me and pretend',                        pt: 'Como você pode olhar para mim e fingir' },
+    { start: 172.6, en: "I'm someone you've never met?",                             pt: 'Que eu sou alguém que você não conhece?' },
+    { start: 181.1, en: "I'm someone you've never met (yeah)",                       pt: 'Que eu sou alguém que você não conhece? (É)' },
+  ],
 };
 
 /* --------------------------------------------------
@@ -1339,7 +1232,9 @@ const CONFIG = {
       this.vy = (Math.random() - 0.5) * 0.18;
       this.r  = Math.random() * 1.5 + 0.3;
       this.alpha = Math.random() * 0.4 + 0.05;
-      this.gold = Math.random() > 0.6;
+      const roll = Math.random();
+      this.gold = roll > 0.55;
+      this.rose  = !this.gold && roll > 0.25;
     }
     update() {
       this.x += this.vx; this.y += this.vy;
@@ -1350,7 +1245,9 @@ const CONFIG = {
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fillStyle = this.gold
         ? `rgba(201,169,110,${this.alpha})`
-        : `rgba(240,232,224,${this.alpha * 0.5})`;
+        : this.rose
+          ? `rgba(232,180,184,${this.alpha * 0.7})`
+          : `rgba(155,138,165,${this.alpha * 0.45})`;
       ctx.fill();
     }
   }
@@ -1380,6 +1277,72 @@ const CONFIG = {
     ctx.clearRect(0, 0, W, H);
     drawConnections();
     particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* --------------------------------------------------
+   1b. CORAÇÕES FLUTUANTES (glow transparente)
+   -------------------------------------------------- */
+(function initHearts() {
+  const canvas = document.getElementById('hearts-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const hearts = [];
+  const COUNT = 28;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function drawHeart(x, y, size, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(size / 16, size / 16);
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = `rgba(232,180,184,${alpha * 0.7})`;
+    ctx.beginPath();
+    ctx.moveTo(0, 4);
+    ctx.bezierCurveTo(0, -4, -8, -4, -8, 2);
+    ctx.bezierCurveTo(-8, 8, 0, 12, 0, 16);
+    ctx.bezierCurveTo(0, 12, 8, 8, 8, 2);
+    ctx.bezierCurveTo(8, -4, 0, -4, 0, 4);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(232,180,184,${alpha * 0.35})`;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  class Heart {
+    constructor() { this.reset(true); }
+    reset(initial) {
+      this.x = Math.random() * W;
+      this.y = initial ? Math.random() * H : H + Math.random() * 80;
+      this.size = Math.random() * 14 + 6;
+      this.speed = Math.random() * 0.45 + 0.2;
+      this.alpha = Math.random() * 0.35 + 0.12;
+      this.wobble = Math.random() * Math.PI * 2;
+      this.wobbleSpeed = Math.random() * 0.02 + 0.008;
+      this.drift = (Math.random() - 0.5) * 0.35;
+    }
+    update() {
+      this.y -= this.speed;
+      this.wobble += this.wobbleSpeed;
+      this.x += this.drift + Math.sin(this.wobble) * 0.3;
+      if (this.y < -30) this.reset(false);
+    }
+    draw() { drawHeart(this.x, this.y, this.size, this.alpha); }
+  }
+
+  for (let i = 0; i < COUNT; i++) hearts.push(new Heart());
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    hearts.forEach(h => { h.update(); h.draw(); });
     requestAnimationFrame(loop);
   }
   loop();
@@ -1431,12 +1394,6 @@ const CONFIG = {
             setTimeout(() => card.classList.add('is-visible'), i * 120);
           });
         }
-        if (entry.target.classList.contains('gallery-grid')) {
-          const items = entry.target.querySelectorAll('.gallery-item');
-          items.forEach((item, i) => {
-            setTimeout(() => item.classList.add('is-visible'), i * 100);
-          });
-        }
       }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
@@ -1444,109 +1401,133 @@ const CONFIG = {
   document.querySelectorAll(
     '.section-eyebrow, .section-title, .divider, .reveal, ' +
     '.carta-inner, .t-item, .interativa-desc, .btn-especial, ' +
-    '.cards-grid, .gallery-grid'
+    '.cards-grid'
   ).forEach(el => observer.observe(el));
 })();
 
 /* --------------------------------------------------
-   4. PAINEL DE MÚSICA — Back To Friends
+   4. MÚSICA — Back To Friends (autoplay)
    -------------------------------------------------- */
 (function initMusic() {
-  const audio       = document.getElementById('bg-audio');
-  const playBtn     = document.getElementById('music-play-btn');
-  const iconPlay    = document.getElementById('icon-play');
-  const iconPause   = document.getElementById('icon-pause');
-  const statusEl    = document.getElementById('music-status');
-  const titleEl     = document.getElementById('music-title');
-  const progress    = document.getElementById('music-progress');
-  const progressFill = document.getElementById('music-progress-fill');
-  const timeEl      = document.getElementById('music-time');
-  const volumeSlider = document.getElementById('music-volume');
+  const audio = document.getElementById('bg-audio');
+  if (!audio) return;
 
   audio.src = CONFIG.musicSrc;
-  titleEl.textContent = CONFIG.musicTitle;
-  audio.volume = parseFloat(volumeSlider.value);
+  audio.volume = 0.65;
+  audio.loop = true;
+  audio.setAttribute('playsinline', '');
+  audio.setAttribute('webkit-playsinline', '');
 
-  function formatTime(sec) {
-    if (!isFinite(sec) || sec < 0) return '0:00';
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
+  let started = false;
+
+  function startMusic() {
+    if (started) return;
+    audio.play().then(() => { started = true; }).catch(() => {});
   }
 
-  function updateUI() {
-    const current = audio.currentTime;
-    const duration = audio.duration || 0;
-    const pct = duration ? (current / duration) * 100 : 0;
+  function unlock() { startMusic(); }
 
-    progressFill.style.width = `${pct}%`;
-    progress.setAttribute('aria-valuenow', Math.round(pct));
-    timeEl.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
-  }
+  startMusic();
 
-  function setPlayingState(playing) {
-    iconPlay.style.display  = playing ? 'none'  : 'block';
-    iconPause.style.display = playing ? 'block' : 'none';
-    statusEl.textContent    = playing ? 'Tocando' : 'Pausada';
-    statusEl.classList.toggle('is-playing', playing);
-  }
-
-  function togglePlay() {
-    if (audio.paused) {
-      audio.play().then(() => setPlayingState(true)).catch(() => setPlayingState(false));
-    } else {
-      audio.pause();
-      setPlayingState(false);
-    }
-  }
-
-  playBtn.addEventListener('click', togglePlay);
-
-  audio.addEventListener('timeupdate', updateUI);
-  audio.addEventListener('loadedmetadata', updateUI);
-  audio.addEventListener('ended', () => setPlayingState(false));
-
-  progress.addEventListener('click', (e) => {
-    const rect = progress.getBoundingClientRect();
-    const ratio = (e.clientX - rect.left) / rect.width;
-    if (audio.duration) audio.currentTime = ratio * audio.duration;
+  ['click', 'touchstart', 'keydown', 'scroll'].forEach(evt => {
+    document.addEventListener(evt, unlock, { once: true, passive: true });
   });
 
-  progress.addEventListener('keydown', (e) => {
-    if (!audio.duration) return;
-    const step = audio.duration * 0.05;
-    if (e.key === 'ArrowRight') audio.currentTime = Math.min(audio.duration, audio.currentTime + step);
-    if (e.key === 'ArrowLeft')  audio.currentTime = Math.max(0, audio.currentTime - step);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && started && audio.paused) startMusic();
   });
-
-  volumeSlider.addEventListener('input', () => {
-    audio.volume = parseFloat(volumeSlider.value);
-  });
-
-  setPlayingState(false);
-  updateUI();
 })();
 
 /* --------------------------------------------------
-   5. OVERLAY CINEMATOGRÁFICO
+   5. OVERLAY — LETRA SINCRONIZADA (Back To Friends)
    -------------------------------------------------- */
 (function initOverlay() {
-  const overlay     = document.getElementById('overlay');
+  const overlay       = document.getElementById('overlay');
   const overlayCanvas = document.getElementById('overlay-canvas');
-  const msgsDiv     = document.getElementById('overlay-msgs');
-  const btnEspecial = document.getElementById('btn-especial');
-  const btnFechar   = document.getElementById('btn-fechar');
+  const lyricsEn      = document.getElementById('lyrics-en');
+  const lyricsPt      = document.getElementById('lyrics-pt');
+  const btnEspecial   = document.getElementById('btn-especial');
+  const btnFechar     = document.getElementById('btn-fechar');
+  const audio         = document.getElementById('bg-audio');
 
-  let overlayCtx, overlayAnim;
+  let overlayCtx, overlayAnim, syncAnim;
+  let lineElsEn = [], lineElsPt = [];
+  let lastActive = -1;
   const oParticles = [];
 
-  // Partículas do overlay (brilhos dourados)
+  function buildLyrics() {
+    lyricsEn.innerHTML = '';
+    lyricsPt.innerHTML = '';
+    lineElsEn = [];
+    lineElsPt = [];
+
+    CONFIG.lyrics.forEach((line, i) => {
+      const en = document.createElement('div');
+      en.className = 'lyric-line';
+      en.dataset.index = i;
+      en.textContent = line.en;
+      lyricsEn.appendChild(en);
+      lineElsEn.push(en);
+
+      const pt = document.createElement('div');
+      pt.className = 'lyric-line';
+      pt.dataset.index = i;
+      pt.textContent = line.pt;
+      lyricsPt.appendChild(pt);
+      lineElsPt.push(pt);
+    });
+  }
+
+  function syncLyrics() {
+    const t = audio.currentTime + (CONFIG.lyricsOffset || 0);
+    let active = -1;
+
+    for (let i = CONFIG.lyrics.length - 1; i >= 0; i--) {
+      if (t >= CONFIG.lyrics[i].start) {
+        active = i;
+        break;
+      }
+    }
+
+    lineElsEn.forEach((el, i) => {
+      el.classList.toggle('active', i === active);
+      el.classList.toggle('past', i < active);
+    });
+    lineElsPt.forEach((el, i) => {
+      el.classList.toggle('active', i === active);
+      el.classList.toggle('past', i < active);
+    });
+
+    if (active >= 0 && active !== lastActive) {
+      lastActive = active;
+      lineElsEn[active].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      lineElsPt[active].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (active < 0) lastActive = -1;
+  }
+
+  function startSync() {
+    cancelAnimationFrame(syncAnim);
+    function tick() {
+      if (overlay.classList.contains('active')) {
+        syncLyrics();
+        syncAnim = requestAnimationFrame(tick);
+      }
+    }
+    tick();
+  }
+
+  function stopSync() {
+    cancelAnimationFrame(syncAnim);
+  }
+
   function initOverlayCanvas() {
     const W = overlayCanvas.width  = window.innerWidth;
     const H = overlayCanvas.height = window.innerHeight;
     overlayCtx = overlayCanvas.getContext('2d');
+    oParticles.length = 0;
 
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 100; i++) {
       oParticles.push({
         x: Math.random() * W,
         y: Math.random() * H,
@@ -1556,7 +1537,7 @@ const CONFIG = {
         alpha: Math.random() * 0.6 + 0.2,
         life: Math.random(),
         decay: Math.random() * 0.003 + 0.001,
-        gold: Math.random() > 0.4,
+        red: Math.random() > 0.45,
         W, H
       });
     }
@@ -1579,16 +1560,17 @@ const CONFIG = {
       const a = p.alpha * Math.min(p.life * 2, 1);
       overlayCtx.beginPath();
       overlayCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      overlayCtx.fillStyle = p.gold
-        ? `rgba(201,169,110,${a})`
-        : `rgba(240,232,224,${a * 0.4})`;
+      overlayCtx.fillStyle = p.red
+        ? `rgba(255,60,80,${a * 0.55})`
+        : `rgba(232,180,184,${a * 0.35})`;
       overlayCtx.fill();
 
-      // brilho
       if (p.r > 1.5) {
         overlayCtx.beginPath();
         overlayCtx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
-        overlayCtx.fillStyle = `rgba(201,169,110,${a * 0.06})`;
+        overlayCtx.fillStyle = p.red
+          ? `rgba(255,40,60,${a * 0.07})`
+          : `rgba(201,169,110,${a * 0.04})`;
         overlayCtx.fill();
       }
     });
@@ -1596,76 +1578,31 @@ const CONFIG = {
     overlayAnim = requestAnimationFrame(drawOverlayParticles);
   }
 
-  function buildMsg(text, type) {
-    if (type === 'sep') {
-      const sep = document.createElement('div');
-      sep.className = 'overlay-sep';
-      msgsDiv.appendChild(sep);
-      return sep;
-    }
-    if (type === 'final') {
-      const d = document.createElement('p');
-      d.className = 'overlay-final';
-      d.textContent = text;
-      msgsDiv.appendChild(d);
-      return d;
-    }
-    const d = document.createElement('p');
-    d.className = 'overlay-msg';
-    d.textContent = text;
-    msgsDiv.appendChild(d);
-    return d;
-  }
-
-  async function runSequence() {
-    const msgs   = CONFIG.overlayMsgs;
-    const final  = CONFIG.overlayFinal;
-    const delay  = ms => new Promise(r => setTimeout(r, ms));
-
-    await delay(900); // aguarda overlay escurecer
-
-    for (const msg of msgs) {
-      const el = buildMsg(msg, 'text');
-      await delay(50);
-      el.classList.add('show');
-      await delay(1600);
-    }
-
-    await delay(400);
-    const sep = buildMsg('', 'sep');
-    await delay(50);
-    sep.classList.add('show');
-    await delay(700);
-
-    const finalEl = buildMsg(final, 'final');
-    await delay(50);
-    finalEl.classList.add('show');
-
-    await delay(1200);
-    btnFechar.classList.add('show');
-  }
+  buildLyrics();
 
   btnEspecial.addEventListener('click', () => {
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
     initOverlayCanvas();
     drawOverlayParticles();
-    runSequence();
+
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+
+    lineElsEn.forEach(el => el.classList.remove('active', 'past'));
+    lineElsPt.forEach(el => el.classList.remove('active', 'past'));
+    lastActive = -1;
+    startSync();
   });
 
   btnFechar.addEventListener('click', () => {
     overlay.classList.remove('active');
     document.body.style.overflow = '';
     cancelAnimationFrame(overlayAnim);
+    stopSync();
     oParticles.length = 0;
-    // Limpa msgs para próxima abertura
-    setTimeout(() => {
-      msgsDiv.innerHTML = '';
-      btnFechar.classList.remove('show');
-    }, 800);
   });
 
-  // Fechar com Escape
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && overlay.classList.contains('active')) {
       btnFechar.click();
